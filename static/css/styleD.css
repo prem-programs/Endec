@@ -23,6 +23,7 @@ body {
     padding: 40px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     animation: fadeIn 0.5s ease-out;
+    position: relative;
 }
 
 @keyframes fadeIn {
@@ -30,6 +31,7 @@ body {
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -137,6 +139,56 @@ form button:active {
     transform: translateY(0);
 }
 
+
+
+.modal-container {
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(41, 39, 39, 0.653);
+    position: fixed;
+    top: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    left: -9999px;
+    pointer-events: none;
+}
+
+.modal-container.show {
+    pointer-events: all;
+    left: 0px;
+}
+
+.modal-content {
+    border-radius: 10px;
+    padding: 20px;
+    background-color: #191515;
+    color: white;
+    width: 393px;
+    height: 219px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.modal-content p {
+    overflow-wrap: break-word;
+    word-break: break-word;
+    text-align: center;
+    background-color: #322f2fa1;
+    border-radius: 8px;
+    padding: 0 24px 0 28px;
+    width: 322px;
+    height: 125px;
+}
+
+.modal-content strong {
+    margin-bottom: 10px;
+}
+
 .output {
     font-size: 15px;
     font-family: "Courier New", monospace;
@@ -177,13 +229,14 @@ form button:active {
     margin-top: -50px;
 }
 
-.output p{
+.output p {
     color: #2d3748;
     font-size: 20px;
     font-weight: 500;
     line-height: 1.6;
     margin: 0;
 }
+
 .output::-webkit-scrollbar {
     width: 8px;
 }
@@ -203,19 +256,36 @@ form button:active {
     margin: 0;
 }
 
-#copy{
+#maxChar {
+    background-color: #abadb3;
+    width: 48px;
+    height: 15px;
+    top: 187px;
+    right: 4px;
+    position: absolute;
+    z-index: 10;
+}
+
+#copy {
     width: 25px;
     height: 25px;
     position: absolute;
     right: 10px;
-    top:22px;
+    top: 27px;
     border: 0px;
-}
-#copy:hover {
-    box-shadow: 1px 2px 9px 6px white;  
+    background-color: #191515;
+    border-radius: 8px;
 }
 
-#copiedBtn{
+#copy svg {
+    color: white;
+}
+
+#copy:hover {
+    background-color: black;
+}
+
+#copiedBtn {
     opacity: 75%;
     background-color: #b3caf9;
     position: absolute;
@@ -223,32 +293,43 @@ form button:active {
     right: 38px;
 }
 
-
-/* Empty state styling */
-.output:empty::after {
-    content: "Your encrypted message will appear here...";
-    color: #a0aec0;
-    font-style: italic;
+#close {
+    margin-top: 12px;
+    padding: 8px 28px;
+    border: none;
+    border-radius: 8px;
+    background-color: #322f2f;
+    color: white;
     font-family: 'Poppins', sans-serif;
     font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
-/* Responsive design */
+#close:hover {
+    background-color: #4a4545;
+    transform: translateY(-1px);
+}
+
+
+
 @media (max-width: 600px) {
     .card {
         padding: 30px 20px;
     }
-    
+
     h1 {
         font-size: 26px;
     }
-    
+
     .card button {
         font-size: 16px;
     }
 }
+
 @media (max-width : 444px) {
-    #copiedBtn{
+    #copiedBtn {
         background-color: #b3caf9;
         position: absolute;
         top: 54px;

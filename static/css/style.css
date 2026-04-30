@@ -23,6 +23,7 @@ body {
     padding: 40px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     animation: fadeIn 0.5s ease-out;
+    position: relative;
 }
 @keyframes fadeIn {
     from {
@@ -136,7 +137,51 @@ form button:active {
     transform: translateY(0);
 }
 
+.modal-container{
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(41, 39, 39, 0.653);
+    position:fixed;
+    top: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    left: -9999px;
+    pointer-events:none;
+}
+
+.modal-container.show{
+    pointer-events: all;
+    left: 0px;
+}
+.modal-content {
+    border-radius: 10px;
+    padding: 20px;
+    background-color: #191515;
+    color: white;
+    width: 393px;
+    height: 219px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+.modal-content p{
+    overflow-wrap: break-word;
+    word-break: break-word;
+    text-align: center;
+    background-color: #322f2fa1;
+    border-radius: 8px;
+    padding: 0 24px 0 28px;
+}
+
+.modal-content strong{
+    margin-bottom: 10px;
+}
 .output {
+    /* display: none; */
     font-size: 15px;
     font-family: "Courier New", monospace;
     border: 2px solid #e2e8f0;
@@ -187,11 +232,18 @@ form button:active {
     height: 25px;
     position: absolute;
     right: 10px;
-    top:22px;
+    top:27px;
     border: 0px;
+    background-color: #191515;
+    border-radius: 8px;
 }
+#copy svg{
+    color: white;
+
+}
+
 #copy:hover {
-    box-shadow: 1px 2px 9px 6px white;  
+    background-color: black;
 }
 
 #copiedBtn{
@@ -200,6 +252,25 @@ form button:active {
     position: absolute;
     top: 24px;
     right: 38px;
+}
+
+#close{
+    margin-top: 12px;
+    padding: 8px 28px;
+    border: none;
+    border-radius: 8px;
+    background-color: #322f2f;
+    color: white;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#close:hover{
+    background-color: #4a4545;
+    transform: translateY(-1px);
 }
 
 

@@ -1,3 +1,5 @@
+from operator import truediv
+from flask import debughelpers
 from flask import Flask, render_template, url_for, request
 from cryptography.fernet import Fernet
 import os 
@@ -51,4 +53,4 @@ def decoder():
 if __name__ == "__main__":
     import os
     port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+    app.run(host="0.0.0.0", port=port,debug=True)
