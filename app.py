@@ -46,7 +46,7 @@ def decoder():
         try:
             decryptedMessage = fernet.decrypt(Emessage.encode()).decode()
         except Exception as e:
-            decryptedMessage = f"Error: {e}"
+            decryptedMessage = f"Enter encrypted message please"
 
     return render_template('decoder.html',name=decryptedMessage)
 

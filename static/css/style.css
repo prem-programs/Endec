@@ -161,12 +161,13 @@ form button:active {
     background-color: #191515;
     color: white;
     width: 393px;
-    height: 219px;
+    height: 307px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     position: relative;
+    
 }
 .modal-content p{
     overflow-wrap: break-word;
@@ -175,6 +176,7 @@ form button:active {
     background-color: #322f2fa1;
     border-radius: 8px;
     padding: 0 24px 0 28px;
+    overflow-y: auto;
 }
 
 .modal-content strong{

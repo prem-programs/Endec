@@ -166,7 +166,7 @@ form button:active {
     background-color: #191515;
     color: white;
     width: 393px;
-    height: 219px;
+    height: 307px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -183,6 +183,7 @@ form button:active {
     padding: 0 24px 0 28px;
     width: 322px;
     height: 125px;
+    overflow-y: auto;
 }
 
 .modal-content strong {
