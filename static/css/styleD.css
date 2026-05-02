@@ -7,75 +7,110 @@
 body {
     font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     display: flex;
-    background: linear-gradient(135deg, #6379de 0%, #1b3b72 100%);
     justify-content: center;
     align-items: center;
     min-height: 100vh;
     padding: 20px;
+    background: linear-gradient(135deg, #0f172a 0%, #0c1a3d 40%, #0f172a 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+body::before,
+body::after {
+    content: '';
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(100px);
+    opacity: 0.3;
+    z-index: 0;
+    animation: floatOrb 14s ease-in-out infinite alternate;
+}
+
+body::before {
+    width: 450px;
+    height: 450px;
+    background: radial-gradient(circle, #3b82f6, transparent 70%);
+    top: -8%;
+    right: -8%;
+}
+
+body::after {
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, #06b6d4, transparent 70%);
+    bottom: -10%;
+    left: -10%;
+    animation-delay: -7s;
+}
+
+@keyframes floatOrb {
+    0% {
+        transform: translate(0, 0) scale(1);
+    }
+
+    100% {
+        transform: translate(-50px, 30px) scale(1.12);
+    }
 }
 
 .card {
-    background: rgb(183 207 255);
-    backdrop-filter: blur(10px);
-    border-radius: 20px;
+    background: rgba(30, 41, 59, 0.65);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(148, 163, 184, 0.12);
+    border-radius: 24px;
     width: 100%;
     max-width: 500px;
     padding: 40px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    animation: fadeIn 0.5s ease-out;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.06);
     position: relative;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    z-index: 1;
 }
 
 .switch {
+    margin: 0 auto 36px;
+    width: 210px;
+    height: 44px;
+    border-radius: 999px;
+    padding: 4px;
     display: flex;
-    justify-content: flex-start;
-    margin-bottom: 20px;
-}
-
-.switch a {
-    display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 16px;
-    background: linear-gradient(125deg, #32ed48 0%, #33bc43e6 100%);
-    color: white;
-    text-decoration: none;
-    border-radius: 10px;
-    font-size: 14px;
+    justify-content: center;
+    gap: 4px;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(148, 163, 184, 0.15);
+}
+
+.switch-btn {
+    border: none;
+    background: transparent;
+    padding: 0.5rem 1.5rem;
+    border-radius: 999px;
+    font-family: 'Space Grotesk', sans-serif;
     font-weight: 600;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    font-size: 13px;
+    color: #94a3b8;
+    cursor: pointer;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.switch a:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+.switch-btn:hover {
+    color: #e2e8f0;
 }
 
-.switch a svg {
-    width: 20px;
-    height: 20px;
-    stroke: white;
+.switch-btn.active {
+    background: linear-gradient(135deg, #2563eb, #3b82f6);
+    color: #fff;
+    box-shadow: 0 2px 12px rgba(59, 130, 246, 0.45);
 }
 
 h1 {
-    font-size: 32px;
+    font-size: 30px;
     font-weight: 700;
     text-align: center;
-    margin-bottom: 30px;
-    background: linear-gradient(135deg, #1832a8 0%, #4b60a2 100%);
+    margin-bottom: 28px;
+    background: linear-gradient(135deg, #60a5fa, #38bdf8);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -88,63 +123,71 @@ h1 {
 
 .card label {
     font-weight: 600;
-    font-size: 16px;
+    font-size: 14px;
     margin-bottom: 10px;
-    color: #2d3748;
+    color: #cbd5e1;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
 }
 
-.card input {
-    border: 2px solid #e2e8f0;
-    border-radius: 12px;
+.card textarea {
+    border: 2px solid rgba(148, 163, 184, 0.15);
+    border-radius: 14px;
     font-size: 15px;
     font-weight: 400;
     width: 100%;
     padding: 14px 16px;
-    margin-bottom: 20px;
+    margin-bottom: 22px;
     transition: all 0.3s ease;
-    background: #f7fafc;
+    background: rgba(15, 23, 42, 0.5);
+    color: #f1f5f9;
+    font-family: inherit;
+    resize: vertical;
 }
 
-.card input:focus {
-    border-color: #667eea;
+.card textarea:focus {
+    border-color: #3b82f6;
     outline: none;
-    background: white;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    background: rgba(15, 23, 42, 0.8);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
 }
 
-.card input::placeholder {
-    color: #a0aec0;
+.card textarea::placeholder {
+    color: #64748b;
 }
 
 form button {
-    border-radius: 12px;
+    border-radius: 14px;
     border: none;
     padding: 16px;
-    color: white;
-    font-size: 18px;
-    font-weight: 600;
+    color: #fff;
+    font-size: 17px;
+    font-weight: 700;
     width: 100%;
-    background: linear-gradient(135deg, #1538d4 0%, #3d4cb5 100%);
+    background: linear-gradient(135deg, #2563eb, #3b82f6);
     cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 20px rgba(59, 130, 246, 0.35);
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
 }
 
 form button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(59, 130, 246, 0.5);
+    background: linear-gradient(135deg, #60a5fa, #93c5fd);
 }
 
 form button:active {
     transform: translateY(0);
+    box-shadow: 0 2px 10px rgba(59, 130, 246, 0.25);
 }
-
-
 
 .modal-container {
     width: 100vw;
     height: 100vh;
-    background-color: rgba(41, 39, 39, 0.653);
+    background-color: rgba(2, 6, 23, 0.75);
+    backdrop-filter: blur(6px);
     position: fixed;
     top: 0;
     right: 0;
@@ -153,63 +196,106 @@ form button:active {
     align-items: center;
     left: -9999px;
     pointer-events: none;
+    z-index: 100;
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
 .modal-container.show {
     pointer-events: all;
-    left: 0px;
+    left: 0;
+    opacity: 1;
 }
 
 .modal-content {
-    border-radius: 10px;
-    padding: 20px;
-    background-color: #191515;
-    color: white;
-    width: 393px;
-    height: 307px;
+    border-radius: 20px;
+    padding: 28px;
+    background: rgba(30, 41, 59, 0.92);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(148, 163, 184, 0.12);
+    color: #f1f5f9;
+    width: 420px;
+    max-width: 90vw;
+    min-height: 280px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     position: relative;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    animation: modalIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.modal-content strong {
+    margin-bottom: 12px;
+    font-size: 15px;
+    color: #60a5fa;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
 }
 
 .modal-content p {
     overflow-wrap: break-word;
     word-break: break-word;
     text-align: center;
-    background-color: #322f2fa1;
-    border-radius: 8px;
-    padding: 0 24px 0 28px;
-    width: 322px;
-    height: 125px;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(148, 163, 184, 0.08);
+    border-radius: 12px;
+    padding: 16px 24px;
     overflow-y: auto;
+    max-height: 150px;
+    color: #e2e8f0;
+    font-size: 14px;
+    line-height: 1.6;
+    width: 100%;
 }
 
-.modal-content strong {
-    margin-bottom: 10px;
+.modal-content p::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-content p::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.modal-content p::-webkit-scrollbar-thumb {
+    background: rgba(59, 130, 246, 0.3);
+    border-radius: 3px;
 }
 
 .output {
     font-size: 15px;
     font-family: "Courier New", monospace;
-    border: 2px solid #e2e8f0;
-    border-radius: 12px;
+    border: 1px solid rgba(148, 163, 184, 0.12);
+    border-radius: 14px;
     padding: 20px;
     margin-top: 25px;
-    background: linear-gradient(135deg, #f0f4ff 0%, #e9f0ff 100%);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    background: rgba(15, 23, 42, 0.5);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     word-wrap: break-word;
     white-space: pre-wrap;
     max-height: 200px;
     overflow-y: auto;
     transition: all 0.3s ease;
     position: relative;
+    color: #e2e8f0;
 }
 
 .output:hover {
     transform: translateY(-1.5px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
 }
 
 .output::before {
@@ -217,90 +303,94 @@ form button:active {
     font-size: 11px;
     font-weight: 700;
     margin-bottom: 12px;
-
 }
-
 
 .output strong {
     font-size: 16px;
     font-weight: 700;
-    color: #38b334;
-    display: block;
-    margin-bottom: -33px;
-    margin-top: -50px;
-}
-
-.output p {
-    color: #2d3748;
-    font-size: 20px;
-    font-weight: 500;
-    line-height: 1.6;
-    margin: 0;
-}
-
-.output::-webkit-scrollbar {
-    width: 8px;
-}
-
-
-.output strong {
-    font-size: 16px;
-    font-weight: 700;
-    color: #4c51bf;
+    color: #60a5fa;
     display: block;
     margin-bottom: -25px;
 }
 
 .output p {
-    color: #2d3748;
+    color: #e2e8f0;
     line-height: 1.6;
     margin: 0;
 }
 
+.output::-webkit-scrollbar {
+    width: 6px;
+}
+
+.output::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.output::-webkit-scrollbar-thumb {
+    background: rgba(59, 130, 246, 0.3);
+    border-radius: 3px;
+}
+
 #maxChar {
-    background-color: #abadb3;
+    background-color: rgba(100, 116, 139, 0.4);
     width: 48px;
     height: 15px;
     top: 187px;
     right: 4px;
     position: absolute;
     z-index: 10;
+    border-radius: 4px;
 }
 
 #copy {
-    width: 25px;
-    height: 25px;
+    width: 32px;
+    height: 32px;
     position: absolute;
-    right: 10px;
-    top: 27px;
-    border: 0px;
-    background-color: #191515;
+    right: 12px;
+    top: 24px;
+    border: 1px solid rgba(148, 163, 184, 0.15);
+    background: rgba(15, 23, 42, 0.5);
     border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
 }
 
 #copy svg {
-    color: white;
+    color: #94a3b8;
+    transition: color 0.25s ease;
 }
 
 #copy:hover {
-    background-color: black;
+    background: rgba(59, 130, 246, 0.15);
+    border-color: #3b82f6;
+}
+
+#copy:hover svg {
+    color: #60a5fa;
 }
 
 #copiedBtn {
-    opacity: 75%;
-    background-color: #b3caf9;
+    font-size: 11px;
+    font-weight: 600;
+    color: #34d399;
+    padding: 2px 8px;
+    border-radius: 6px;
     position: absolute;
-    top: 24px;
-    right: 38px;
+    top: 28px;
+    right: 50px;
 }
 
 #close {
-    margin-top: 12px;
-    padding: 8px 28px;
-    border: none;
-    border-radius: 8px;
-    background-color: #322f2f;
-    color: white;
+    margin-top: 16px;
+    padding: 10px 32px;
+    border: 1px solid rgba(148, 163, 184, 0.15);
+    border-radius: 10px;
+    background: rgba(15, 23, 42, 0.5);
+    color: #cbd5e1;
     font-family: 'Poppins', sans-serif;
     font-size: 14px;
     font-weight: 600;
@@ -309,11 +399,11 @@ form button:active {
 }
 
 #close:hover {
-    background-color: #4a4545;
+    background: rgba(59, 130, 246, 0.12);
+    border-color: #3b82f6;
+    color: #f1f5f9;
     transform: translateY(-1px);
 }
-
-
 
 @media (max-width: 600px) {
     .card {
@@ -329,10 +419,8 @@ form button:active {
     }
 }
 
-@media (max-width : 444px) {
+@media (max-width: 444px) {
     #copiedBtn {
-        background-color: #b3caf9;
-        position: absolute;
         top: 54px;
         right: -3px;
     }

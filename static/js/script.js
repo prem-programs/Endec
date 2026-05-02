@@ -2,14 +2,12 @@ const modal_container = document.querySelector(".modal-container");
 const encrypt = document.getElementById("encrypt");
 const input = document.getElementById("message");
 
-// Auto-show modal if server rendered a result (page reload after POST)
+
 const existingResult = modal_container.querySelector("p");
 if (existingResult && existingResult.textContent.trim()) {
     modal_container.classList.add("show");
     bindModalButtons();
 }
-
-// Handle form submission via fetch (no page reload)
 encrypt.addEventListener("click", (e) => {
     e.preventDefault();
     const formData = new FormData(document.querySelector("form"));
@@ -33,7 +31,6 @@ encrypt.addEventListener("click", (e) => {
         });
 });
 
-// Bind copy & close buttons inside the modal
 function bindModalButtons() {
     const copyBtn = document.getElementById("copy");
     const copiedSpan = document.getElementById("copiedBtn");
@@ -56,3 +53,30 @@ function bindModalButtons() {
         });
     }
 }
+
+const buttons = document.querySelectorAll(".switch-btn");
+
+
+const currentPath = window.location.pathname;
+console.log(currentPath)
+buttons.forEach(btn => {
+    const mode = btn.dataset.mode.toLowerCase();
+    if ((currentPath === "/" && mode === "encrypt") || (currentPath.includes("decoder") && mode === "decrypt")) {
+        btn.classList.add("active");
+    }
+
+
+    btn.addEventListener("click", () => {
+
+        if ((currentPath === "/" && mode === "encrypt") || (currentPath.includes("decoder") && mode === "decrypt")) {
+            return;
+        }
+
+
+        if (mode === "encrypt") {
+            window.location.href = "/";
+        } else {
+            window.location.href = "/decoder";
+        }
+    });
+});
