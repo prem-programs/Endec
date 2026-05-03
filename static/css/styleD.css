@@ -415,8 +415,9 @@ form button:active {
     }
 
     .card button {
-        font-size: 16px;
-    }
+
+        font-size: 13px;
+    };
 }
 
 @media (max-width: 444px) {
