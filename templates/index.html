@@ -25,14 +25,14 @@
 
         <h1>Message Encrypter</h1>
 
-        <form method="POST" action="{{ url_for('index') }}">
+        <form >
             <label for="message">Enter your message</label>
             <textarea id="message" name="message" rows="4" placeholder="Paste your message here" required></textarea>
             <div class="password">
-                <label for="password">Enter password</label>
+                <label for="password">Enter password(optional)</label>
                 <input type="password" name="password" placeholder="•••••••••••" id="pass">
             </div>
-            <button type="submit" id="encrypt">Encrypt</button>
+            <button type="submit" id="encode">Encrypt</button>
         </form>
 
     </div>
