@@ -36,23 +36,12 @@ encrypt-decrypt/<br>
 ├── README.md
 
 ---
-# Have a look(screenshots)
-## Encrypter
-
-<img width="1003" height="923" alt="Screenshot 2026-02-05 171314" src="https://github.com/user-attachments/assets/e5a2bd95-1455-46c8-9375-3fa0b5a563c6" />
-
-## Decrypter
-<img width="1013" height="887" alt="Screenshot 2026-02-05 171356" src="https://github.com/user-attachments/assets/dd6f1676-ac90-4764-a877-be682276ecdf" />
-
----
 
 ## Found a bug?
 if you found an issue or would like to submit an improvement to this project, please submit an issue using the issue tab above.
 
 ---
-
-## know issues  (work in progress)
-1.This is not responsive for mobile devices  
-2.Server may take some time to respond
+## Future updates (coming soon)
+direct link to share with friends 
 
 ---
