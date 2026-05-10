@@ -12,7 +12,7 @@ if (encryptBtn) {
         const pass = inputPass ? inputPass.value : " ";
 
         if (!message) {
-            alert("Please enter  a message .");
+            alert("Please enter a message .");
             return;
         }
 
