@@ -23,19 +23,23 @@
         </div>
         <h1>Message Decrypter</h1>
 
-        <form method="POST" action="{{ url_for('decoder') }}">
+        <form>
             <label for="message">Enter your encrypted message</label>
-            <textarea id="message" name="message" rows="4" placeholder="Paste your encrypted message here" required></textarea>
-            <button type="submit" id="encrypt">Decrypt</button>
+            <textarea id="emessage" name="message" rows="4" placeholder="Paste your encrypted message here" required></textarea>
+            <div class="ePassword">
+                <label for="password">Enter password(if any)</label>
+                <input type="password" name="password" placeholder="•••••••••••" id="ePassword">
+            </div>
+            <button type="submit" id="decode">Decrypt</button>
         </form>
 
     </div>
     <div class="modal-container">
         <div class="modal-content">
-            {% if name %}
+            
             <strong>Decrypted Message: <br></strong>
-            <p><br><br>{{ name }}</p>
-            {% endif %}
+            <p id="dmessage"></p>
+
             <button id="copy"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="15" height="15"
                     color="currentColor" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
                     stroke-linejoin="round">

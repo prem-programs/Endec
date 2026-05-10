@@ -183,6 +183,32 @@ form button:active {
     box-shadow: 0 2px 10px rgba(22, 163, 74, 0.3);
 }
 
+.password input{
+    border: 2px solid rgba(148, 163, 184, 0.15);
+    border-radius: 14px;
+    font-size: 15px;
+    font-weight: 400;
+    width: 100%;
+    padding: 14px 16px;
+    margin-bottom: 22px;
+    transition: all 0.3s ease;
+    background: rgba(15, 23, 42, 0.5);
+    color: #f1f5f9;
+    font-family: inherit;
+    resize: vertical;
+}
+
+.card textarea:focus {
+    border-color: #16a34a;
+    outline: none;
+    background: rgba(15, 23, 42, 0.8);
+    box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.15);
+}
+
+.card .password::placeholder {
+    color: #64748b;
+}
+
 .modal-container {
     width: 100vw;
     height: 100vh;

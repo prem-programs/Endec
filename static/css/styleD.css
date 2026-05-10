@@ -105,6 +105,33 @@ body::after {
     box-shadow: 0 2px 12px rgba(59, 130, 246, 0.45);
 }
 
+
+.ePassword input{
+    border: 2px solid rgba(148, 163, 184, 0.15);
+    border-radius: 14px;
+    font-size: 15px;
+    font-weight: 400;
+    width: 100%;
+    padding: 14px 16px;
+    margin-bottom: 22px;
+    transition: all 0.3s ease;
+    background: rgba(15, 23, 42, 0.5);
+    color: #f1f5f9;
+    font-family: inherit;
+    resize: vertical;
+}
+
+.card .ePassword:focus {
+    border-color: #16a34a;
+    outline: none;
+    background: rgba(15, 23, 42, 0.8);
+    box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.15);
+}
+
+.card .ePassword::placeholder {
+    color: #64748b;
+}
+
 h1 {
     font-size: 30px;
     font-weight: 700;
