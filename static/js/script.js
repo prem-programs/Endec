@@ -17,7 +17,7 @@ if (encryptBtn) {
         }
 
         try {
-            const resultText = await encryptAESGCM(message, pass);
+            const resultText = await encryptAESGCM(message, pass); // actual encryption performs from here 
             const encryptedText = resultText;
             console.log(encryptedText)
             const resultElement = modal_container.querySelector("p");
@@ -27,6 +27,18 @@ if (encryptBtn) {
 
             modal_container.classList.add("show");
             bindModalButtons(encryptedText);
+
+            const data = await fetch('/secret',{
+                method :"POST",
+                headers :{
+                    'Content-Type':'application/json'
+                },
+                body: JSON.stringify({
+                    'message':encryptedText
+                })
+           });
+           const result = await data.json()
+           console.log("from backend",result)
 
         } catch (error) {
             console.log("encryption failed ", error)
