@@ -17,7 +17,7 @@ def delete(id):
         msg = db.session.get(Encryptedmessage , id)
         db.session.delete(msg)
         db.session.commit()
-        print(f"cleaned after 5 second {id}")
+        print(f"cleaned after 5 second id-{id}")
 
 
 @app.route('/',methods=['POST','GET'])
@@ -46,15 +46,30 @@ def secret():
         db.session.add(emsg)
         db.session.commit()
         id = emsg.id
-        Timer(5,delete,args=[emsg.id]).start() # sets timer 5 second and sends id to delete function 
+        # Timer(20,delete,args=[emsg.id]).start() # sets timer 5 second and sends id to delete function 
 
     except Exception as e :
         print (e)
     
     return jsonify({
-        "received":msg
+        "received":msg,
+            "id":id
+
     })
 
+@app.route('/api/secret/<int:uid>',methods=['GET'])
+def get_secret(uid):
+    enc_message = db.session.get(Encryptedmessage,uid)
+
+    if not enc_message:
+        return jsonify({
+            "message":"Message can't retrieve"
+        })
+
+    return jsonify ({
+        "emessage":enc_message.emessage,
+        "id":uid
+    })
 
 if __name__ == "__main__":
     import os

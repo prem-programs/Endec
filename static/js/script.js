@@ -4,6 +4,8 @@ const inputMessage = document.getElementById("message");
 const inputPass = document.getElementById("pass");
 const existingResult = modal_container.querySelector("p");
 
+// // Encode the password so special characters don't break the URL
+// const shareableLink = `${window.location.origin}/secret/${data.id}#${encodeURIComponent(pass)}`;
 if (encryptBtn) {
     encryptBtn.addEventListener("click", async (e) => {
         e.preventDefault();
@@ -19,14 +21,14 @@ if (encryptBtn) {
         try {
             const resultText = await encryptAESGCM(message, pass); // actual encryption performs from here 
             const encryptedText = resultText;
-            console.log(encryptedText)
-            const resultElement = modal_container.querySelector("p");
-            if (resultElement) {
-                resultElement.textContent = encryptedText;
-            }
+            // console.log(encryptedText)
+            // const resultElement = modal_container.querySelector("p");
+            // if (resultElement) {
+            //     resultElement.textContent = encryptedText;
+            // }
 
-            modal_container.classList.add("show");
-            bindModalButtons(encryptedText);
+            // modal_container.classList.add("show");
+            // bindModalButtons(encryptedText);
 
             const data = await fetch('/secret',{
                 method :"POST",
@@ -40,7 +42,23 @@ if (encryptBtn) {
            const result = await data.json()
            console.log("from backend",result)
 
-        } catch (error) {
+           if (result.id){
+                const shareableLink = `${window.location.origin}/decoder?id=${result.id}#${encodeURIComponent(pass)}`;
+                
+                const linkElement = modal_container.querySelector("#shareable-link-p");
+                if (linkElement) {
+                    linkElement.textContent = shareableLink;
+                }
+
+                const rawElement = modal_container.querySelector("#raw-message-p");
+                if (rawElement) {
+                    rawElement.textContent = encryptedText;
+                }
+
+                modal_container.classList.add("show");
+                bindModalButtons(); 
+            }
+        }catch (error) {
             console.log("encryption failed ", error)
         }
 
@@ -51,45 +69,87 @@ const decryptBtn = document.getElementById("decode");
 const password = document.getElementById("ePassword");
 
 
+document.addEventListener("DOMContentLoaded",async ()=>{
+    // exact id from url
+    const urlParams = new URLSearchParams(window.location.search);
+    const uid = urlParams.get('id');
+    const hashPass = window.location.hash.substring(1);
+
+    if (uid){
+        const response = await fetch(`/api/secret/${uid}`);
+        const data = await response.json();
+
+        if (!response.ok || data.error) {
+            alert(data.error || "Message could not be retrieved or was already destroyed.");
+            return;
+        }
+
+        const message = data.emessage;
+
+        if(hashPass){
+            const pass = decodeURIComponent(hashPass) // this decodes url ; %20 => space 
+            const decrypted_message = await decryptAESGCM(message,pass);
+
+            const resultElement = document.getElementById("dmessage");
+            if (resultElement) {
+                resultElement.textContent = decrypted_message;
+            }
+
+            modal_container.classList.add("show");
+            bindModalButtons();
+            
+            // Clean the URL to hide the password from the address bar
+            history.replaceState(null, null, ' ');
+        }
+    }
+})
+
+
+
+
+// manual encryption if decrypt btn clicks
 if (decryptBtn) {
     decryptBtn.addEventListener("click", async (e) => {
         e.preventDefault();
 
-        const message = emessage.value.trim();
-        const pass = password.value.trim();
+        const messageText = emessage.value.trim();
+        const passText = password.value.trim();
 
-       
+        if (!messageText) {
+            alert("Please enter the encrypted message.");
+            return;
+        }
+
         try {
-            const decryptedMessage = await decryptAESGCM(message, pass);
-
-            const resultElement = document.getElementById("dmessage")
-
+            const decryptedMessage = await decryptAESGCM(messageText, passText);
+            
+            const resultElement = document.getElementById("dmessage");
             if (resultElement) {
                 resultElement.textContent = decryptedMessage;
             }
 
-            console.log("Decrypted:", decryptedMessage);
-
             modal_container.classList.add("show");
-
-            bindModalButtons(decryptedMessage);
+            bindModalButtons();
 
         } catch (error) {
             console.error("Decryption failed:", error);
-            alert("Wrong password or corrupted encrypted text");
+            alert("Wrong password or corrupted encrypted text.");
         }
     });
 }
 
 
-function bindModalButtons(textToCopy) {
-    const copyBtn = document.getElementById("copy");
-    const copiedSpan = document.getElementById("copiedBtn");
+function bindModalButtons() {
+    const copyBtns = document.querySelectorAll(".copy-btn");
     const closeBtn = document.getElementById("close");
 
+    copyBtns.forEach(btn => {
+        btn.onclick = () => {
+            const targetId = btn.getAttribute("data-target");
+            const textToCopy = document.getElementById(targetId)?.textContent || "";
+            const spanId = btn.getAttribute("data-span");
+            const copiedSpan = document.getElementById(spanId);
 
-    if (copyBtn) {
-        copyBtn.onclick = () => {
             navigator.clipboard.writeText(textToCopy).then(() => {
                 if (copiedSpan) {
                     copiedSpan.innerText = "copied!";
@@ -99,7 +159,7 @@ function bindModalButtons(textToCopy) {
                 }
             });
         };
-    }
+    });
 
     if (closeBtn) {
         closeBtn.onclick = () => {
@@ -232,4 +292,3 @@ async function decryptAESGCM(data, password) {
 
     return decoder.decode(decrypted);
 }
-``

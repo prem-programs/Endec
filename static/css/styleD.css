@@ -370,7 +370,7 @@ form button:active {
     border-radius: 4px;
 }
 
-#copy {
+.copy-btn {
     width: 32px;
     height: 32px;
     position: absolute;
@@ -386,21 +386,21 @@ form button:active {
     transition: all 0.25s ease;
 }
 
-#copy svg {
+.copy-btn svg {
     color: #94a3b8;
     transition: color 0.25s ease;
 }
 
-#copy:hover {
+.copy-btn:hover {
     background: rgba(59, 130, 246, 0.15);
     border-color: #3b82f6;
 }
 
-#copy:hover svg {
+.copy-btn:hover svg {
     color: #60a5fa;
 }
 
-#copiedBtn {
+.copiedBtn {
     font-size: 11px;
     font-weight: 600;
     color: #34d399;
@@ -448,7 +448,7 @@ form button:active {
 }
 
 @media (max-width: 444px) {
-    #copiedBtn {
+    .copiedBtn {
         top: 54px;
         right: -3px;
     }
