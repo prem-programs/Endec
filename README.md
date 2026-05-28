@@ -1,47 +1,54 @@
-# Encrypt-Decrypt Web App
+# Endec - Secure Message Encrypter & Decrypter
 
-**A simple Flask web application to encrypt and decrypt messages securely using Fernet symmetric encryption.**
+**Endec** is a modern, web-based encryption application that allows users to encrypt secret messages and share them securely using a link. 
 
-This project demonstrates how to build a basic encryption/decryption web app with Python and Flask. It is easy to run locally and deploy to cloud platforms like Render. 
+Unlike traditional server-side encryption tools, Endec utilizes **Client-Side End-to-End Encryption (E2EE)**. The encryption and decryption happen entirely in the browser using the Web Crypto API (AES-GCM). The backend server only ever receives and stores the unreadable ciphertext, ensuring maximum privacy.
 
 ---
-## Real life use cases
-We can use this to send secret message to anyone in encrypted form and tell them to navigate to decrypter [https://privacy-matters.onrender.com/decoder] and paste the message over there and read the message 
+
+## Real-Life Use Case
+
+Need to send a password, API key, or confidential note to a colleague or friend? 
+1. Type your message into the Endec Encrypter and provide a password (or let it auto-generate one).
+2. Endec encrypts the text in your browser and generates a secure, shareable link.
+3. Send the link to your recipient. When they open it, their browser extracts the password from the URL hash, fetches the ciphertext from the database, and decrypts the message locally.
 
 ---
 
 ## Features
 
-- 🛡️ Message encryption using `cryptography.Fernet`
-- 🔓 Message decryption
-- 🌐 Web interface using Flask templates
-- 🧠 Designed for learning and secure message handling
-- ☁️ Ready for deployment (Render)
+- **True Client-Side Encryption:** Utilizes AES-GCM 256-bit encryption via the browser's native Web Crypto API.
+- **Secure Shareable Links:** Passwords are included in the URL fragment (`#`), which is never transmitted to the server.
+- **Flask & SQLite Backend:** A lightweight Python backend that acts purely as a secure pastebin for the ciphertext.
+- **Modern Glassmorphism UI:** A sleek, responsive, and animated user interface.
+- **One-Click Copy:** Easily copy shareable links, raw ciphertexts, and decrypted messages.
 
 ---
 
-## 📌 Demo
-Click here for demo of projects
-*[click here ](https://privacy-matters.onrender.com/)*
----
+## Tech Stack
 
-## 📂 Project Structure
-encrypt-decrypt/<br>
-├── app.py<br>
-├── requirements.txt <br>
-├── static/<br>
-│ └── css/ <br>
-├── templates/<br>
-├── .gitignore <br>
-├── README.md
+- **Frontend:** HTML5, CSS3, Vanilla JavaScript (Web Crypto API)
+- **Backend:** Python, Flask, Flask-SQLAlchemy
+- **Database:** SQLite
 
 ---
 
-## Found a bug?
-if you found an issue or would like to submit an improvement to this project, please submit an issue using the issue tab above.
+## Project Structure
 
----
-## Future updates (coming soon)
-direct link to share with friends 
+```text
+Endec/
+├── app.py                 # Main Flask application and API routes
+├── requirements.txt       # Python dependencies
+├── instance/
+│   └── messages.db        # SQLite database for storing ciphertext
+├── static/
+│   ├── css/
+│   │   ├── style.css      # Styles for the Encrypter page
+│   │   └── styleD.css     # Styles for the Decrypter page
+│   └── js/
+│       └── script.js      # Client-side AES-GCM encryption/decryption logic
+└── templates/
+    ├── index.html         # Encrypter UI
+    └── decoder.html       # Decrypter UI
+```
 
----
