@@ -8,7 +8,7 @@ Unlike traditional server-side encryption tools, Endec utilizes **Client-Side En
 
 ## Real-Life Use Case
 
-Need to send a password, API key, or confidential note to a colleague or friend? 
+Need to send a password, API key, or confidential note to a colleague or friend and can't trust your messaging app ? 
 1. Type your message into the Endec Encrypter and provide a password (or let it auto-generate one).
 2. Endec encrypts the text in your browser and generates a secure, shareable link.
 3. Send the link to your recipient. When they open it, their browser extracts the password from the URL hash, fetches the ciphertext from the database, and decrypts the message locally.
