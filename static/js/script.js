@@ -10,12 +10,16 @@ if (encryptBtn) {
     encryptBtn.addEventListener("click", async (e) => {
         e.preventDefault();
 
-        const message = inputMessage.value;
-        const pass = inputPass ? inputPass.value : " ";
+        const message = inputMessage.value;;
+        let pass = inputPass.value.trim();
         
         if (!message) {
             alert("Please enter a message .");
             return;
+        }
+        if (!pass) {
+            const randomBytes = crypto.getRandomValues(new Uint8Array(12));
+            pass = btoa(String.fromCharCode(...randomBytes)); 
         }
 
         try {
