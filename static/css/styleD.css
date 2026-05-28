@@ -170,6 +170,32 @@ h1 {
     color: #f1f5f9;
     font-family: inherit;
     resize: vertical;
+    overflow: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(59, 130, 246, 0.35) rgba(15, 23, 42, 0.4);
+}
+
+.card textarea::-webkit-scrollbar {
+    width: 10px;
+}
+
+.card textarea::-webkit-scrollbar-track {
+    background: rgba(15, 23, 42, 0.4);
+    border-radius: 999px;
+}
+
+.card textarea::-webkit-scrollbar-thumb {
+    background: rgba(59, 130, 246, 0.35);
+    border-radius: 999px;
+    border: 2px solid rgba(15, 23, 42, 0.5);
+}
+
+.card textarea::-webkit-scrollbar-thumb:hover {
+    background: rgba(59, 130, 246, 0.55);
+}
+
+.card textarea::-webkit-scrollbar-corner {
+    background: rgba(15, 23, 42, 0.4);
 }
 
 .card textarea:focus {
@@ -314,7 +340,6 @@ form button:active {
     word-wrap: break-word;
     white-space: pre-wrap;
     max-height: 200px;
-    overflow-y: auto;
     transition: all 0.3s ease;
     position: relative;
     color: #e2e8f0;
@@ -374,10 +399,10 @@ form button:active {
     width: 32px;
     height: 32px;
     position: absolute;
-    right: 12px;
-    top: 24px;
-    border: 1px solid rgba(148, 163, 184, 0.15);
-    background: rgba(15, 23, 42, 0.5);
+    right: 17px;
+    top: 71px;
+    border: 1px solid rgba(59, 130, 246, 0.25);
+    background: rgba(59, 130, 246, 0.08);
     border-radius: 8px;
     cursor: pointer;
     display: flex;
@@ -387,17 +412,17 @@ form button:active {
 }
 
 .copy-btn svg {
-    color: #94a3b8;
+    color: #ffffff;
     transition: color 0.25s ease;
 }
 
 .copy-btn:hover {
-    background: rgba(59, 130, 246, 0.15);
+    background: rgba(59, 130, 246, 0.18);
     border-color: #3b82f6;
 }
 
 .copy-btn:hover svg {
-    color: #60a5fa;
+    color: #ffffff;
 }
 
 .copiedBtn {

@@ -4,7 +4,7 @@ const inputMessage = document.getElementById("message");
 const inputPass = document.getElementById("pass");
 const existingResult = modal_container.querySelector("p");
 
-// // Encode the password so special characters don't break the URL
+// Encode the password so special characters don't break the URL
 // const shareableLink = `${window.location.origin}/secret/${data.id}#${encodeURIComponent(pass)}`;
 if (encryptBtn) {
     encryptBtn.addEventListener("click", async (e) => {
@@ -12,7 +12,7 @@ if (encryptBtn) {
 
         const message = inputMessage.value;
         const pass = inputPass ? inputPass.value : " ";
-
+        
         if (!message) {
             alert("Please enter a message .");
             return;
@@ -21,16 +21,10 @@ if (encryptBtn) {
         try {
             const resultText = await encryptAESGCM(message, pass); // actual encryption performs from here 
             const encryptedText = resultText;
-            // console.log(encryptedText)
-            // const resultElement = modal_container.querySelector("p");
-            // if (resultElement) {
-            //     resultElement.textContent = encryptedText;
-            // }
+            
+            // sending encryptedText to flask which will send encrypted text to sqlite database
 
-            // modal_container.classList.add("show");
-            // bindModalButtons(encryptedText);
-
-            const data = await fetch('/secret',{
+            const data = await fetch('/secret',{ 
                 method :"POST",
                 headers :{
                     'Content-Type':'application/json'
@@ -42,8 +36,9 @@ if (encryptBtn) {
            const result = await data.json()
            console.log("from backend",result)
 
+
            if (result.id){
-                const shareableLink = `${window.location.origin}/decoder?id=${result.id}#${encodeURIComponent(pass)}`;
+                const shareableLink = `${window.location.origin}/decoder?id=${result.id}#${btoa(encodeURIComponent(pass))}`;
                 
                 const linkElement = modal_container.querySelector("#shareable-link-p");
                 if (linkElement) {
@@ -72,9 +67,9 @@ const password = document.getElementById("ePassword");
 document.addEventListener("DOMContentLoaded",async ()=>{
     // exact id from url
     const urlParams = new URLSearchParams(window.location.search);
-    const uid = urlParams.get('id');
-    const hashPass = window.location.hash.substring(1);
-
+    const uid = urlParams.get('id'); // gets id if any presents 
+    const hashPass= window.location.hash.substring(1); 
+    console.log(hashPass)
     if (uid){
         const response = await fetch(`/api/secret/${uid}`);
         const data = await response.json();
@@ -87,7 +82,7 @@ document.addEventListener("DOMContentLoaded",async ()=>{
         const message = data.emessage;
 
         if(hashPass){
-            const pass = decodeURIComponent(hashPass) // this decodes url ; %20 => space 
+            const pass = atob(decodeURIComponent(hashPass)) // this decodes url ; %20 => space 
             const decrypted_message = await decryptAESGCM(message,pass);
 
             const resultElement = document.getElementById("dmessage");
@@ -114,7 +109,7 @@ if (decryptBtn) {
 
         const messageText = emessage.value.trim();
         const passText = password.value.trim();
-
+        
         if (!messageText) {
             alert("Please enter the encrypted message.");
             return;
@@ -166,6 +161,32 @@ function bindModalButtons() {
             modal_container.classList.remove("show");
         };
     }
+}
+
+const globalCloseBtn = document.getElementById("close");
+if (globalCloseBtn) {
+    globalCloseBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        modal_container.classList.remove("show");
+        
+        
+    });
+}
+
+if (modal_container) {
+    modal_container.addEventListener("click", (e) => {
+        if (e.target === modal_container ) {
+            modal_container.classList.remove("show");
+        }
+    });
+}
+if(modal_container){
+    document.addEventListener("keydown",(event)=>{
+            if (event.key === "Escape") {
+            modal_container.classList.remove("show");
+        
+        }
+    })
 }
 
 const buttons = document.querySelectorAll(".switch-btn");
