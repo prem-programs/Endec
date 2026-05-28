@@ -143,6 +143,32 @@ h1 {
     color: #f1f5f9;
     font-family: inherit;
     resize: vertical;
+    overflow: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(22, 163, 74, 0.35) rgba(15, 23, 42, 0.4);
+}
+
+.card textarea::-webkit-scrollbar {
+    width: 10px;
+}
+
+.card textarea::-webkit-scrollbar-track {
+    background: rgba(15, 23, 42, 0.4);
+    border-radius: 999px;
+}
+
+.card textarea::-webkit-scrollbar-thumb {
+    background: rgba(22, 163, 74, 0.35);
+    border-radius: 999px;
+    border: 2px solid rgba(15, 23, 42, 0.5);
+}
+
+.card textarea::-webkit-scrollbar-thumb:hover {
+    background: rgba(22, 163, 74, 0.55);
+}
+
+.card textarea::-webkit-scrollbar-corner {
+    background: rgba(15, 23, 42, 0.4);
 }
 
 .card textarea:focus {
@@ -313,7 +339,6 @@ form button:active {
     word-wrap: break-word;
     white-space: pre-wrap;
     max-height: 200px;
-    overflow-y: auto;
     transition: all 0.3s ease;
     position: relative;
     color: #e2e8f0;
@@ -346,14 +371,14 @@ form button:active {
     margin: 0;
 }
 
-#copy {
+.copy-btn {
     width: 32px;
     height: 32px;
     position: absolute;
     right: 12px;
     top: 24px;
-    border: 1px solid rgba(148, 163, 184, 0.15);
-    background: rgba(15, 23, 42, 0.5);
+    border: 1px solid rgba(22, 163, 74, 0.25);
+    background: rgba(22, 163, 74, 0.08);
     border-radius: 8px;
     cursor: pointer;
     display: flex;
@@ -362,21 +387,21 @@ form button:active {
     transition: all 0.25s ease;
 }
 
-#copy svg {
-    color: #94a3b8;
+.copy-btn svg {
+    color: #ffffff;
     transition: color 0.25s ease;
 }
 
-#copy:hover {
-    background: rgba(22, 163, 74, 0.2);
+.copy-btn:hover {
+    background: rgba(22, 163, 74, 0.18);
     border-color: #16a34a;
 }
 
-#copy:hover svg {
-    color: #4ade80;
+.copy-btn:hover svg {
+    color: #ffffff;
 }
 
-#copiedBtn {
+.copiedBtn {
     font-size: 11px;
     font-weight: 600;
     color: #22d3ee;
@@ -388,7 +413,7 @@ form button:active {
 }
 
 #close {
-    margin-top: 16px;
+    margin-top: 25px;
     padding: 10px 32px;
     border: 1px solid rgba(148, 163, 184, 0.15);
     border-radius: 10px;
@@ -455,7 +480,7 @@ form button:active {
         position: relative;
         z-index: 1;
     }
-    #copiedBtn {
+    .copiedBtn {
         top: 54px;
         right: -3px;
     }
