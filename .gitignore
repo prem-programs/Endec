@@ -1,7 +1,6 @@
 venv/
 env/
 *.key
-secret.bin
 .env
 __pycache__/
 *.pyc
@@ -14,4 +13,6 @@ test.css
 test.html
 test2.html
 Dualcryptlogo.png
-.db
+* .db
+
+timeblock.py
