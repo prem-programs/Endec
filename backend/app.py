@@ -1,29 +1,11 @@
-from threading  import Timer
 from flask import Flask,render_template,request,jsonify
 import os 
-from flask_sqlalchemy import SQLAlchemy
+from backend.db import db , Encryptedmessage,app
 
-app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///messages.db" 
-db = SQLAlchemy(app)
-
-class Encryptedmessage(db.Model):
-    id = db.Column(db.Integer(),primary_key= True)
-    emessage = db.Column(db.String(),nullable = False)
-
-
-def delete(id):
-    with app.app_context():
-        msg = db.session.get(Encryptedmessage , id)
-        db.session.delete(msg)
-        db.session.commit()
-        print(f"cleaned after 5 second id-{id}")
 
 
 @app.route('/',methods=['POST','GET'])
 def index():
-    
-    
     return render_template('index.html')
 
 
@@ -38,10 +20,14 @@ def secret():
     data= request.get_json()
     msg = data.get('message')
 
+    if not msg:
+        return jsonify({"message":"No message found!"}),404
+
     emsg = Encryptedmessage(
         emessage = msg
     )
 
+    id = None
     try :
         db.session.add(emsg)
         db.session.commit()
@@ -49,6 +35,7 @@ def secret():
         # Timer(20,delete,args=[emsg.id]).start() # sets timer 5 second and sends id to delete function 
 
     except Exception as e :
+        db.session.rollback()
         print (e)
     
     return jsonify({
@@ -57,6 +44,7 @@ def secret():
 
     })
 
+
 @app.route('/api/secret/<int:uid>',methods=['GET'])
 def get_secret(uid):
     enc_message = db.session.get(Encryptedmessage,uid)
@@ -64,16 +52,9 @@ def get_secret(uid):
     if not enc_message:
         return jsonify({
             "message":"Message can't retrieve"
-        })
+        }),404
 
     return jsonify ({
         "emessage":enc_message.emessage,
         "id":uid
     })
-
-if __name__ == "__main__":
-    import os
-    port = int(os.environ.get("PORT", 5000))
-    with app.app_context():
-        db.create_all()
-    app.run(host="0.0.0.0", port=port,debug=True)

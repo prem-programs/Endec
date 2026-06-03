@@ -1,7 +1,6 @@
 venv/
-env/
-*.key
 .env
+*.key
 __pycache__/
 *.pyc
 *.pyo

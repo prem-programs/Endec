@@ -11,7 +11,7 @@ body {
     align-items: center;
     min-height: 100vh;
     padding: 20px;
-    background: linear-gradient(135deg, #0f172a 0%, #0c1a3d 40%, #0f172a 100%);
+    background: linear-gradient(135deg, #0f172a 0%, #052e16 40%, #0f172a 100%);
     position: relative;
     overflow: hidden;
 }
@@ -22,26 +22,26 @@ body::after {
     position: fixed;
     border-radius: 50%;
     filter: blur(100px);
-    opacity: 0.3;
+    opacity: 0.35;
     z-index: 0;
-    animation: floatOrb 14s ease-in-out infinite alternate;
+    animation: floatOrb 12s ease-in-out infinite alternate;
 }
 
 body::before {
-    width: 450px;
-    height: 450px;
-    background: radial-gradient(circle, #3b82f6, transparent 70%);
-    top: -8%;
-    right: -8%;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, #16a34a, transparent 70%);
+    top: -10%;
+    left: -10%;
 }
 
 body::after {
     width: 400px;
     height: 400px;
-    background: radial-gradient(circle, #06b6d4, transparent 70%);
+    background: radial-gradient(circle, #a3e635, transparent 70%);
     bottom: -10%;
-    left: -10%;
-    animation-delay: -7s;
+    right: -10%;
+    animation-delay: -6s;
 }
 
 @keyframes floatOrb {
@@ -50,7 +50,7 @@ body::after {
     }
 
     100% {
-        transform: translate(-50px, 30px) scale(1.12);
+        transform: translate(60px, -40px) scale(1.15);
     }
 }
 
@@ -100,36 +100,9 @@ body::after {
 }
 
 .switch-btn.active {
-    background: linear-gradient(135deg, #2563eb, #3b82f6);
+    background: linear-gradient(135deg, #16a34a, #22c55e);
     color: #fff;
-    box-shadow: 0 2px 12px rgba(59, 130, 246, 0.45);
-}
-
-
-.ePassword input{
-    border: 2px solid rgba(148, 163, 184, 0.15);
-    border-radius: 14px;
-    font-size: 15px;
-    font-weight: 400;
-    width: 100%;
-    padding: 14px 16px;
-    margin-bottom: 22px;
-    transition: all 0.3s ease;
-    background: rgba(15, 23, 42, 0.5);
-    color: #f1f5f9;
-    font-family: inherit;
-    resize: vertical;
-}
-
-.card .ePassword:focus {
-    border-color: #16a34a;
-    outline: none;
-    background: rgba(15, 23, 42, 0.8);
-    box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.15);
-}
-
-.card .ePassword::placeholder {
-    color: #64748b;
+    box-shadow: 0 2px 12px rgba(22, 163, 74, 0.45);
 }
 
 h1 {
@@ -137,7 +110,7 @@ h1 {
     font-weight: 700;
     text-align: center;
     margin-bottom: 28px;
-    background: linear-gradient(135deg, #60a5fa, #38bdf8);
+    background: linear-gradient(135deg, #4ade80, #a3e635);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -172,7 +145,7 @@ h1 {
     resize: vertical;
     overflow: auto;
     scrollbar-width: thin;
-    scrollbar-color: rgba(59, 130, 246, 0.35) rgba(15, 23, 42, 0.4);
+    scrollbar-color: rgba(22, 163, 74, 0.35) rgba(15, 23, 42, 0.4);
 }
 
 .card textarea::-webkit-scrollbar {
@@ -185,13 +158,13 @@ h1 {
 }
 
 .card textarea::-webkit-scrollbar-thumb {
-    background: rgba(59, 130, 246, 0.35);
+    background: rgba(22, 163, 74, 0.35);
     border-radius: 999px;
     border: 2px solid rgba(15, 23, 42, 0.5);
 }
 
 .card textarea::-webkit-scrollbar-thumb:hover {
-    background: rgba(59, 130, 246, 0.55);
+    background: rgba(22, 163, 74, 0.55);
 }
 
 .card textarea::-webkit-scrollbar-corner {
@@ -199,10 +172,10 @@ h1 {
 }
 
 .card textarea:focus {
-    border-color: #3b82f6;
+    border-color: #16a34a;
     outline: none;
     background: rgba(15, 23, 42, 0.8);
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+    box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.15);
 }
 
 .card textarea::placeholder {
@@ -215,25 +188,51 @@ form button {
     padding: 16px;
     color: #fff;
     font-size: 17px;
-    font-weight: 700;
+    font-weight: 600;
     width: 100%;
-    background: linear-gradient(135deg, #2563eb, #3b82f6);
+    background: linear-gradient(135deg, #16a34a, #22c55e);
     cursor: pointer;
     transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 20px rgba(59, 130, 246, 0.35);
+    box-shadow: 0 4px 20px rgba(22, 163, 74, 0.35);
     letter-spacing: 0.03em;
     text-transform: uppercase;
 }
 
 form button:hover {
     transform: translateY(-3px);
-    box-shadow: 0 8px 30px rgba(59, 130, 246, 0.5);
-    background: linear-gradient(135deg, #60a5fa, #93c5fd);
+    box-shadow: 0 8px 30px rgba(22, 163, 74, 0.5);
+    background: linear-gradient(135deg, #4ade80, #86efac);
 }
 
 form button:active {
     transform: translateY(0);
-    box-shadow: 0 2px 10px rgba(59, 130, 246, 0.25);
+    box-shadow: 0 2px 10px rgba(22, 163, 74, 0.3);
+}
+
+.password input{
+    border: 2px solid rgba(148, 163, 184, 0.15);
+    border-radius: 14px;
+    font-size: 15px;
+    font-weight: 400;
+    width: 100%;
+    padding: 14px 16px;
+    margin-bottom: 22px;
+    transition: all 0.3s ease;
+    background: rgba(15, 23, 42, 0.5);
+    color: #f1f5f9;
+    font-family: inherit;
+    resize: vertical;
+}
+
+.card textarea:focus {
+    border-color: #16a34a;
+    outline: none;
+    background: rgba(15, 23, 42, 0.8);
+    box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.15);
+}
+
+.card .password::placeholder {
+    color: #64748b;
 }
 
 .modal-container {
@@ -294,7 +293,7 @@ form button:active {
 .modal-content strong {
     margin-bottom: 12px;
     font-size: 15px;
-    color: #60a5fa;
+    color: #4ade80;
     letter-spacing: 0.03em;
     text-transform: uppercase;
 }
@@ -324,7 +323,7 @@ form button:active {
 }
 
 .modal-content p::-webkit-scrollbar-thumb {
-    background: rgba(59, 130, 246, 0.3);
+    background: rgba(22, 163, 74, 0.3);
     border-radius: 3px;
 }
 
@@ -339,7 +338,7 @@ form button:active {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     word-wrap: break-word;
     white-space: pre-wrap;
-    max-height: 200px;
+    max-height: 220px;
     transition: all 0.3s ease;
     position: relative;
     color: #e2e8f0;
@@ -360,9 +359,10 @@ form button:active {
 .output strong {
     font-size: 16px;
     font-weight: 700;
-    color: #60a5fa;
+    color: #4ade80;
     display: block;
-    margin-bottom: -25px;
+    margin-bottom: -24px;
+    margin-top: -50px;
 }
 
 .output p {
@@ -371,38 +371,14 @@ form button:active {
     margin: 0;
 }
 
-.output::-webkit-scrollbar {
-    width: 6px;
-}
-
-.output::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.output::-webkit-scrollbar-thumb {
-    background: rgba(59, 130, 246, 0.3);
-    border-radius: 3px;
-}
-
-#maxChar {
-    background-color: rgba(100, 116, 139, 0.4);
-    width: 48px;
-    height: 15px;
-    top: 187px;
-    right: 4px;
-    position: absolute;
-    z-index: 10;
-    border-radius: 4px;
-}
-
 .copy-btn {
     width: 32px;
     height: 32px;
     position: absolute;
-    right: 17px;
-    top: 71px;
-    border: 1px solid rgba(59, 130, 246, 0.25);
-    background: rgba(59, 130, 246, 0.08);
+    right: 12px;
+    top: 24px;
+    border: 1px solid rgba(22, 163, 74, 0.25);
+    background: rgb(22 31 49);
     border-radius: 8px;
     cursor: pointer;
     display: flex;
@@ -417,8 +393,8 @@ form button:active {
 }
 
 .copy-btn:hover {
-    background: rgba(59, 130, 246, 0.18);
-    border-color: #3b82f6;
+    background: rgba(22, 163, 74, 0.18);
+    border-color: #16a34a;
 }
 
 .copy-btn:hover svg {
@@ -426,18 +402,18 @@ form button:active {
 }
 
 .copiedBtn {
-    font-size: 11px;
+    font-size: 8px;
     font-weight: 600;
-    color: #34d399;
+    color: #22d3ee;
     padding: 2px 8px;
     border-radius: 6px;
     position: absolute;
-    top: 28px;
-    right: 50px;
+    top: 67px;
+    right: 5px;
 }
 
 #close {
-    margin-top: 16px;
+    margin-top: 25px;
     padding: 10px 32px;
     border: 1px solid rgba(148, 163, 184, 0.15);
     border-radius: 10px;
@@ -451,28 +427,59 @@ form button:active {
 }
 
 #close:hover {
-    background: rgba(59, 130, 246, 0.12);
-    border-color: #3b82f6;
+    background: rgba(22, 163, 74, 0.15);
+    border-color: #16a34a;
     color: #f1f5f9;
     transform: translateY(-1px);
 }
 
+.output::-webkit-scrollbar {
+    width: 6px;
+}
+
+.output::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.output::-webkit-scrollbar-thumb {
+    background: rgba(22, 163, 74, 0.3);
+    border-radius: 3px;
+}
+
+.output:empty::after {
+    content: "Your encrypted message will appear here...";
+    color: #64748b;
+    font-style: italic;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+}
+
 @media (max-width: 600px) {
     .card {
-        padding: 30px 20px;
+        padding: 28px 18px;
     }
 
     h1 {
-        font-size: 26px;
+        font-size: 24px;
     }
 
-    .card button {
-
-        font-size: 13px;
-    };
+    form button {
+        font-size: 15px;
+    }
 }
 
 @media (max-width: 444px) {
+    .card{
+        width: 100%;
+        max-width: 700px;
+        height: auto;
+        padding: 40px;
+        padding-top: 55px;
+        padding-bottom: 66px;
+        box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        position: relative;
+        z-index: 1;
+    }
     .copiedBtn {
         top: 54px;
         right: -3px;

@@ -38,7 +38,6 @@ if (encryptBtn) {
                 })
            });
            const result = await data.json()
-           console.log("from backend",result)
 
 
            if (result.id){
@@ -73,7 +72,6 @@ document.addEventListener("DOMContentLoaded",async ()=>{
     const urlParams = new URLSearchParams(window.location.search);
     const uid = urlParams.get('id'); // gets id if any presents 
     const hashPass= window.location.hash.substring(1); 
-    console.log(hashPass)
     if (uid){
         const response = await fetch(`/api/secret/${uid}`);
         const data = await response.json();
@@ -106,7 +104,7 @@ document.addEventListener("DOMContentLoaded",async ()=>{
 
 
 
-// manual encryption if decrypt btn clicks
+// manual decrypt btn
 if (decryptBtn) {
     decryptBtn.addEventListener("click", async (e) => {
         e.preventDefault();
@@ -195,7 +193,6 @@ if(modal_container){
 
 const buttons = document.querySelectorAll(".switch-btn");
 const currentPath = window.location.pathname;
-// console.log(currentPath)
 buttons.forEach(btn => {
     const mode = btn.dataset.mode.toLowerCase();
     if ((currentPath === "/" && mode === "encrypt") || (currentPath.includes("decoder") && mode === "decrypt")) {
