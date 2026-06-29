@@ -68,6 +68,12 @@ body::after {
     z-index: 1;
 }
 
+.logocontainer h1 {
+    position: absolute;
+    top: 16px;
+    left: 42px;
+}
+
 .switch {
     margin: 0 auto 36px;
     width: 210px;
@@ -106,7 +112,7 @@ body::after {
 }
 
 
-.ePassword input{
+.ePassword input {
     border: 2px solid rgba(148, 163, 184, 0.15);
     border-radius: 14px;
     font-size: 15px;
@@ -469,7 +475,9 @@ form button:active {
     .card button {
 
         font-size: 13px;
-    };
+    }
+
+    ;
 }
 
 @media (max-width: 444px) {

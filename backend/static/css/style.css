@@ -68,6 +68,12 @@ body::after {
     z-index: 1;
 }
 
+.logocontainer h1 {
+    position: absolute;
+    top: 16px;
+    left: 42px;
+}
+
 .switch {
     margin: 0 auto 36px;
     width: 210px;
@@ -209,7 +215,7 @@ form button:active {
     box-shadow: 0 2px 10px rgba(22, 163, 74, 0.3);
 }
 
-.password input{
+.password input {
     border: 2px solid rgba(148, 163, 184, 0.15);
     border-radius: 14px;
     font-size: 15px;
@@ -469,7 +475,7 @@ form button:active {
 }
 
 @media (max-width: 444px) {
-    .card{
+    .card {
         width: 100%;
         max-width: 700px;
         height: auto;
@@ -480,6 +486,7 @@ form button:active {
         position: relative;
         z-index: 1;
     }
+
     .copiedBtn {
         top: 54px;
         right: -3px;
