@@ -12,37 +12,37 @@ if (encryptBtn) {
 
         const message = inputMessage.value;;
         let pass = inputPass.value.trim();
-        
+
         if (!message) {
             alert("Please enter a message .");
             return;
         }
         if (!pass) {
             const randomBytes = crypto.getRandomValues(new Uint8Array(12));
-            pass = btoa(String.fromCharCode(...randomBytes)); 
+            pass = btoa(String.fromCharCode(...randomBytes));
         }
 
         try {
             const resultText = await encryptAESGCM(message, pass); // actual encryption performs from here 
             const encryptedText = resultText;
-            
+
             // sending encryptedText to flask which will send encrypted text to sqlite database
 
-            const data = await fetch('/secret',{ 
-                method :"POST",
-                headers :{
-                    'Content-Type':'application/json'
+            const data = await fetch('/secret', {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    'message':encryptedText
+                    'message': encryptedText
                 })
-           });
-           const result = await data.json()
+            });
+            const result = await data.json()
 
 
-           if (result.id){
+            if (result.id) {
                 const shareableLink = `${window.location.origin}/decoder?id=${result.id}#${btoa(encodeURIComponent(pass))}`;
-                
+
                 const linkElement = modal_container.querySelector("#shareable-link-p");
                 if (linkElement) {
                     linkElement.textContent = shareableLink;
@@ -54,9 +54,9 @@ if (encryptBtn) {
                 }
 
                 modal_container.classList.add("show");
-                bindModalButtons(); 
+                bindModalButtons();
             }
-        }catch (error) {
+        } catch (error) {
             console.log("encryption failed ", error)
         }
 
@@ -67,12 +67,15 @@ const decryptBtn = document.getElementById("decode");
 const password = document.getElementById("ePassword");
 
 
-document.addEventListener("DOMContentLoaded",async ()=>{
+document.addEventListener("DOMContentLoaded", async () => {
     // exact id from url
     const urlParams = new URLSearchParams(window.location.search);
     const uid = urlParams.get('id'); // gets id if any presents 
-    const hashPass= window.location.hash.substring(1); 
-    if (uid){
+    const hashPass = window.location.hash.substring(1);
+
+    
+
+    if (uid) {
         const response = await fetch(`/api/secret/${uid}`);
         const data = await response.json();
 
@@ -83,9 +86,11 @@ document.addEventListener("DOMContentLoaded",async ()=>{
 
         const message = data.emessage;
 
-        if(hashPass){
+        if (hashPass) {
+            
+            // user_pass = document.querySelector('#inp_password').textContent
             const pass = atob(decodeURIComponent(hashPass)) // this decodes url ; %20 => space 
-            const decrypted_message = await decryptAESGCM(message,pass);
+            const decrypted_message = await decryptAESGCM(message, pass);
 
             const resultElement = document.getElementById("dmessage");
             if (resultElement) {
@@ -93,8 +98,8 @@ document.addEventListener("DOMContentLoaded",async ()=>{
             }
 
             modal_container.classList.add("show");
-            bindModalButtons();
-            
+            bindModalButtons(uid);
+
             // Clean the URL to hide the password from the address bar
             history.replaceState(null, null, ' ');
         }
@@ -111,7 +116,7 @@ if (decryptBtn) {
 
         const messageText = emessage.value.trim();
         const passText = password.value.trim();
-        
+
         if (!messageText) {
             alert("Please enter the encrypted message.");
             return;
@@ -119,7 +124,7 @@ if (decryptBtn) {
 
         try {
             const decryptedMessage = await decryptAESGCM(messageText, passText);
-            
+
             const resultElement = document.getElementById("dmessage");
             if (resultElement) {
                 resultElement.textContent = decryptedMessage;
@@ -135,8 +140,17 @@ if (decryptBtn) {
     });
 }
 
+async function cleanData(uid) {
+    if (!uid) return;
+    try {
+        const response = await fetch(`/api/del/${uid}`, { method: 'DELETE' });
+        console.log(await response.json());
+    } catch (e) {
+        console.error("Cleanup failed", e);
+    }
+}
 
-function bindModalButtons() {
+function bindModalButtons(uid = null) {
     const copyBtns = document.querySelectorAll(".copy-btn");
     const closeBtn = document.getElementById("close");
 
@@ -161,6 +175,7 @@ function bindModalButtons() {
     if (closeBtn) {
         closeBtn.onclick = () => {
             modal_container.classList.remove("show");
+            cleanData(uid);
         };
     }
 }
@@ -170,23 +185,23 @@ if (globalCloseBtn) {
     globalCloseBtn.addEventListener("click", (e) => {
         e.preventDefault();
         modal_container.classList.remove("show");
-        
-        
+
+
     });
 }
 
 if (modal_container) {
     modal_container.addEventListener("click", (e) => {
-        if (e.target === modal_container ) {
+        if (e.target === modal_container) {
             modal_container.classList.remove("show");
         }
     });
 }
-if(modal_container){
-    document.addEventListener("keydown",(event)=>{
-            if (event.key === "Escape") {
+if (modal_container) {
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
             modal_container.classList.remove("show");
-        
+
         }
     })
 }
@@ -314,3 +329,29 @@ async function decryptAESGCM(data, password) {
 
     return decoder.decode(decrypted);
 }
+
+// Advanced Features Toggle Logic
+document.addEventListener("DOMContentLoaded", () => {
+    const advancedToggle = document.getElementById("advancedToggle");
+    const advancedFeatures = document.getElementById("advancedFeatures");
+
+    if (advancedToggle && advancedFeatures) {
+        advancedToggle.addEventListener("click", () => {
+            advancedToggle.classList.toggle("open");
+            if (advancedFeatures.style.display === "none") {
+                advancedFeatures.style.display = "flex";
+            } else {
+                advancedFeatures.style.display = "none";
+            }
+        });
+    }
+
+    // Toggle switch text logic
+    const burnToggle = document.getElementById("burnToggle");
+    const toggleText = document.querySelector(".toggle-text");
+    if (burnToggle && toggleText) {
+        burnToggle.addEventListener("change", () => {
+            toggleText.textContent = burnToggle.checked ? "ON" : "OFF";
+        });
+    }
+});

@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Securely encrypt your messages with DualCrypt — a modern encryption tool.">
-    <title>Message Encoder — DualCrypt</title>
+    <title>Encryption-Endec</title>
     <link rel="stylesheet" href="{{url_for('static',filename='css/style.css')}}">
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
@@ -28,9 +28,48 @@
         <form>
             <label for="message">Enter your Secret</label>
             <textarea id="message" name="message" rows="4" placeholder="Paste your message here" required></textarea>
+
             <div class="password">
                 <label for="password">Enter password(optional)</label>
                 <input type="password" name="password" placeholder="•••••••••••" id="pass">
+            </div>
+
+            <div class="advanced-toggle" id="advancedToggle">
+                <span class="advanced-section-title">ADVANCED PRIVACY FEATURES</span>
+                <svg id="advancedChevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16"
+                    color="currentColor" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M6 9l6 6 6-6" />
+                </svg>
+            </div>
+
+            <div class="advanced-features" id="advancedFeatures" style="display: none;">
+                <div class="feature-item">
+                    <label for="expiry">Expiry Time</label>
+                    <div class="select-wrapper">
+                        <select id="expiry" name="expiry">
+                            <option value="1h">1 Hour</option>
+                            <option value="24h">24 Hours</option>
+                            <option value="7d">7 Days</option>
+                        </select>
+                        <svg class="select-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16"
+                            height="16" color="currentColor" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M6 9l6 6 6-6" />
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="feature-item">
+                    <label for="burnToggle">Burn-After-Reading</label>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="burnToggle" name="burnToggle" checked>
+                        <label for="burnToggle" class="toggle-label">
+                            <span class="toggle-switch-handle"></span>
+                        </label>
+                        <span class="toggle-text">ON</span>
+                    </div>
+                </div>
             </div>
             <button type="submit" id="encode">Encrypt</button>
         </form>
