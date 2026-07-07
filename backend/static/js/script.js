@@ -25,8 +25,9 @@ if (encryptBtn) {
         try {
             const resultText = await encryptAESGCM(message, pass); // actual encryption performs from here 
             const encryptedText = resultText;
-
-            // sending encryptedText to flask which will send encrypted text to sqlite database
+            let exp = document.getElementById('expiry')
+            
+            // sending encryptedText to flask which will send encrypted text to database
 
             const data = await fetch('/secret', {
                 method: "POST",
@@ -34,11 +35,11 @@ if (encryptBtn) {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    'message': encryptedText
+                    'message': encryptedText,
+                    'expiry': exp.value
                 })
             });
-            const result = await data.json()
-
+            const result = await data.json()            
 
             if (result.id) {
                 const shareableLink = `${window.location.origin}/decoder?id=${result.id}#${btoa(encodeURIComponent(pass))}`;
@@ -140,6 +141,7 @@ if (decryptBtn) {
     });
 }
 
+
 async function cleanData(uid) {
     if (!uid) return;
     try {
@@ -171,13 +173,13 @@ function bindModalButtons(uid = null) {
             });
         };
     });
-
-    if (closeBtn) {
+    if (closeBtn ) {
         closeBtn.onclick = () => {
             modal_container.classList.remove("show");
             cleanData(uid);
         };
     }
+    
 }
 
 const globalCloseBtn = document.getElementById("close");
@@ -330,6 +332,8 @@ async function decryptAESGCM(data, password) {
     return decoder.decode(decrypted);
 }
 
+
+
 // Advanced Features Toggle Logic
 document.addEventListener("DOMContentLoaded", () => {
     const advancedToggle = document.getElementById("advancedToggle");
@@ -355,3 +359,4 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 });
+

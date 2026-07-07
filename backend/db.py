@@ -24,7 +24,6 @@ class Encryptedmessage(db.Model):
     __tablename__ = "encrypted_message"
     id: Mapped[int] = mapped_column(primary_key=True)
     emessage: Mapped[str] = mapped_column(Text)
-    
 
 
 # Create tables

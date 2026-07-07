@@ -1,47 +1,56 @@
-from flask import Flask,render_template,request,jsonify
-import os 
-from backend.db import db , Encryptedmessage,app
+from flask import render_template, request, jsonify
+from backend.db import db, Encryptedmessage, app
+from threading import Timer
 
-
-
-@app.route('/',methods=['POST','GET'])
+@app.route('/', methods=['POST', 'GET'])
 def index():
     return render_template('index.html')
 
 
 @app.route('/decoder')
 def decoder():
-   
     return render_template('decoder.html')
 
+def del_message(uid):
+    msg_to_delete = db.session.get(Encryptedmessage, uid)
+    if msg_to_delete:
+        db.session.delete(msg_to_delete)
+        db.session.commit()
+        return jsonify({"message": "Message deleted"}), 200
+    return jsonify({"message": "Not found"}), 404
 
-@app.route('/secret',methods = ['POST'])
+@app.route('/secret', methods=['POST'])
 def secret():
-    data= request.get_json()
-    msg = data.get('message')
+    data = request.get_json(silent=True)
+    
+    if not data or not data.get('message'):
+        return jsonify({"message": "No message found!"}), 404
+    
 
-    if not msg:
-        return jsonify({"message":"No message found!"}),404
+    msg = data.get('message')
+    exp =data.get('expiry')
 
     emsg = Encryptedmessage(
-        emessage = msg
+        emessage=msg
     )
 
-    id = None
-    try :
+    message_id = None
+    try:
         db.session.add(emsg)
         db.session.commit()
-        id = emsg.id
-        # Timer(20,delete,args=[emsg.id]).start() # sets timer 5 second and sends id to delete function 
+        message_id = emsg.id
+        if exp :
+            Timer(int(exp)*3600 ,del_message , args=message_id).start()
+            
+    
 
-    except Exception as e :
+    except Exception as e:
         db.session.rollback()
-        print (e)
+        print(e)
     
     return jsonify({
-        "received":msg,
-            "id":id
-
+        "received": msg,
+        "id": message_id
     })
 
 
@@ -53,8 +62,18 @@ def get_secret(uid):
         return jsonify({
             "message":"Message can't retrieve"
         }),404
+    else:
 
-    return jsonify ({
-        "emessage":enc_message.emessage,
-        "id":uid
-    })
+        return jsonify ({
+            "emessage":enc_message.emessage,
+            "id":uid
+        })
+    
+@app.route('/api/del/<int:uid>',methods=['DELETE'])
+def cleanup(uid):
+    msg_to_delete = db.session.get(Encryptedmessage, uid)
+    if msg_to_delete:
+        db.session.delete(msg_to_delete)
+        db.session.commit()
+        return jsonify({"message": "Message deleted"}), 200
+    return jsonify({"message": "Not found"}), 404

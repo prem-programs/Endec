@@ -297,6 +297,12 @@ form button:active {
     }
 }
 
+.fill_pass{
+    opacity: 0;
+}
+.fill_pass .show{
+    opacity: 1;
+}
 .modal-content strong {
     margin-bottom: 12px;
     font-size: 15px;

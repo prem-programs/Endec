@@ -492,3 +492,142 @@ form button:active {
         right: -3px;
     }
 }
+
+/* Advanced Privacy Features */
+.advanced-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    margin-bottom: 20px;
+    width: fit-content;
+}
+
+.advanced-section-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    user-select: none;
+}
+
+.advanced-toggle svg {
+    color: #94a3b8;
+    transition: transform 0.3s ease;
+}
+
+.advanced-toggle.open svg {
+    transform: rotate(180deg);
+}
+
+.advanced-features {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 22px;
+    gap: 15px;
+    background: rgba(15, 23, 42, 0.3);
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(148, 163, 184, 0.08);
+}
+
+.feature-item {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.feature-item label {
+    font-size: 12px;
+    color: #cbd5e1;
+    margin-bottom: 8px;
+    text-transform: none;
+    letter-spacing: normal;
+}
+
+/* Custom Select */
+.select-wrapper {
+    position: relative;
+}
+
+select {
+    width: 100%;
+    appearance: none;
+    background: rgba(15, 23, 42, 0.5);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 8px;
+    color: #f1f5f9;
+    padding: 10px 32px 10px 12px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    outline: none;
+    cursor: pointer;
+}
+
+select:focus {
+    border-color: #16a34a;
+}
+
+.select-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: #64748b;
+}
+
+/* Toggle Switch */
+.toggle-switch {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.toggle-switch input[type="checkbox"] {
+    display: none;
+}
+
+.toggle-label {
+    display: inline-block;
+    width: 46px;
+    height: 24px;
+    background-color: #334155;
+    border-radius: 20px;
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.toggle-switch input[type="checkbox"]:checked+.toggle-label {
+    background-color: #4ade80;
+    box-shadow: 0 0 10px rgba(74, 222, 128, 0.2);
+}
+
+.toggle-switch-handle {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    background-color: #fff;
+    border-radius: 50%;
+    transition: transform 0.3s;
+}
+
+.toggle-switch input[type="checkbox"]:checked+.toggle-label .toggle-switch-handle {
+    transform: translateX(22px);
+    background-color: #111827;
+}
+
+.toggle-text {
+    font-size: 12px;
+    font-weight: 600;
+    color: #4ade80;
+}
+
+.toggle-switch input[type="checkbox"]:not(:checked)~.toggle-text {
+    color: #64748b;
+}
