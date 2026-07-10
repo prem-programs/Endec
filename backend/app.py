@@ -29,7 +29,7 @@ def secret():
 
     msg = data.get('message')
     exp =data.get('expiry')
-
+    print(exp)
     emsg = Encryptedmessage(
         emessage=msg
     )

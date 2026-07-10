@@ -19,20 +19,14 @@
         <h1>Endec</h1>
     </div>
     <div class="card">
-
-        <div class="switch">
-            <button class="switch-btn" data-mode="encrypt">Encrypt</button>
-            <button class="switch-btn" data-mode="decrypt">Decrypt</button>
-        </div>
-
         <form>
             <label for="message">Enter your Secret</label>
-            <textarea id="message" name="message" rows="4" placeholder="Paste your message here" required></textarea>
-
-            <div class="password">
-                <label for="password">Enter password(optional)</label>
-                <input type="password" name="password" placeholder="•••••••••••" id="pass">
+            <div class="textarea-wrapper">
+                <textarea id="message" name="message" rows="4" placeholder="Paste your message here"
+                    required></textarea>
+                
             </div>
+
 
             <div class="advanced-toggle" id="advancedToggle">
                 <span class="advanced-section-title">ADVANCED PRIVACY FEATURES</span>
@@ -45,6 +39,10 @@
 
             <div class="advanced-features" id="advancedFeatures" style="display: none;">
                 <div class="feature-item">
+                    <div class="password">
+                        <label for="password">Enter password</label>
+                        <input type="password" name="password" placeholder="•••••••••••" id="pass">
+                    </div>
                     <label for="expiry">Expiry Time</label>
                     <div class="select-wrapper">
                         <select id="expiry" name="expiry">
@@ -57,19 +55,20 @@
                             stroke-linecap="round" stroke-linejoin="round">
                             <path d="M6 9l6 6 6-6" />
                         </svg>
+                        <div class="feature-item">
+                            <label for="burnToggle">Burn-After-Reading</label>
+                            <div class="toggle-switch">
+                                <input type="checkbox" id="burnToggle" name="burnToggle" checked>
+                                <label for="burnToggle" class="toggle-label">
+                                    <span class="toggle-switch-handle"></span>
+                                </label>
+                                <span class="toggle-text">ON</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="feature-item">
-                    <label for="burnToggle">Burn-After-Reading</label>
-                    <div class="toggle-switch">
-                        <input type="checkbox" id="burnToggle" name="burnToggle" checked>
-                        <label for="burnToggle" class="toggle-label">
-                            <span class="toggle-switch-handle"></span>
-                        </label>
-                        <span class="toggle-text">ON</span>
-                    </div>
-                </div>
+
             </div>
             <button type="submit" id="encode">Encrypt</button>
         </form>
