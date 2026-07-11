@@ -10,11 +10,11 @@ if (encryptBtn) {
     encryptBtn.addEventListener("click", async (e) => {
         e.preventDefault();
 
-        const message = inputMessage.dataset.pdfData || inputMessage.value;
+        const message = inputMessage.dataset.fileData || inputMessage.dataset.pdfData || inputMessage.value;
         let pass = inputPass.value.trim();
 
         if (!message) {
-            alert("Please enter a message or select a PDF.");
+            alert("Please enter a message or attach a file.");
             return;
         }
         if (!pass) {
@@ -72,23 +72,83 @@ function displayDecryptedMessage(decrypted_message) {
     const resultElement = document.getElementById("dmessage");
     if (!resultElement) return;
 
-    if (decrypted_message.startsWith("data:application/pdf;base64,")) {
+    if (decrypted_message.startsWith("data:")) {
+        let mimeType = "application/octet-stream";
+        let fileName = "decrypted_file";
+        let downloadUrl = decrypted_message;
+
+        const match = decrypted_message.match(/^data:([^;]+)(?:;name=([^;]+))?;base64,/);
+        if (match) {
+            mimeType = match[1];
+            if (match[2]) {
+                fileName = decodeURIComponent(match[2]);
+            } else {
+                const ext = mimeType.split("/")[1] || "bin";
+                fileName = `decrypted_document.${ext}`;
+            }
+        }
+
+        // Determine icon SVG and color based on mime type
+        let iconSvg = `
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+        `;
+        let iconColor = "#3b82f6"; // Blue default
+
+        if (mimeType.startsWith("image/")) {
+            iconSvg = `
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                    <polyline points="21 15 16 10 5 21"></polyline>
+                </svg>
+            `;
+            iconColor = "#10b981"; // Green
+        } else if (mimeType === "application/pdf") {
+            iconSvg = `
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+            `;
+            iconColor = "#ef4444"; // Red
+        } else if (mimeType.startsWith("audio/")) {
+            iconSvg = `
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 18V5l12-2v13"></path>
+                    <circle cx="6" cy="18" r="3"></circle>
+                    <circle cx="18" cy="16" r="3"></circle>
+                </svg>
+            `;
+            iconColor = "#8b5cf6"; // Purple
+        } else if (mimeType.startsWith("video/")) {
+            iconSvg = `
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="23 7 16 12 23 17 23 7"></polygon>
+                    <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+                </svg>
+            `;
+            iconColor = "#f59e0b"; // Amber
+        }
+
         resultElement.innerHTML = `
-            <div class="pdf-download-container">
+            <div class="pdf-download-container" style="border-left: 4px solid ${iconColor};">
                 <span class="pdf-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                        <polyline points="14 2 14 8 20 8"></polyline>
-                        <line x1="16" y1="13" x2="8" y2="13"></line>
-                        <line x1="16" y1="17" x2="8" y2="17"></line>
-                        <polyline points="10 9 9 9 8 9"></polyline>
-                    </svg>
+                    ${iconSvg}
                 </span>
                 <div class="pdf-info">
-                    <span class="pdf-name">Decrypted Document.pdf</span>
+                    <span class="pdf-name" style="word-break: break-all;">${fileName}</span>
                 </div>
-                <a href="${decrypted_message}" download="decrypted_document.pdf" class="pdf-dl-btn">
-                    <span>Download PDF</span>
+                <a href="${downloadUrl}" download="${fileName}" class="pdf-dl-btn">
+                    <span>Download File</span>
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                         <polyline points="7 10 12 15 17 10"></polyline>
@@ -388,7 +448,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-// PDF file selection logic
+// File selection logic
 document.addEventListener("DOMContentLoaded", () => {
     const pdfAddBtn = document.getElementById("pdf-add-btn");
     const pdfSelect = document.getElementById("pdf-select");
@@ -402,9 +462,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 pdfSelect.value = "";
                 inputMessage.value = "";
                 inputMessage.readOnly = false;
+                delete inputMessage.dataset.fileData;
                 delete inputMessage.dataset.pdfData;
                 pdfAddBtn.classList.remove("active");
-                pdfAddBtn.title = "Add PDF file";
+                pdfAddBtn.title = "Add file";
             } else {
                 // Trigger select
                 pdfSelect.click();
@@ -414,18 +475,20 @@ document.addEventListener("DOMContentLoaded", () => {
         pdfSelect.addEventListener("change", (e) => {
             const file = e.target.files[0];
             if (file) {
-                if (file.type !== "application/pdf") {
-                    alert("Please select a PDF file.");
-                    return;
-                }
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     const dataUrl = event.target.result;
-                    inputMessage.value = `[PDF Document: ${file.name} (${Math.round(file.size / 1024)} KB)]`;
+                    
+                    // Construct custom data URL including the filename parameter
+                    const mimeType = file.type || "application/octet-stream";
+                    const base64Part = dataUrl.split(",")[1];
+                    const customDataUrl = `data:${mimeType};name=${encodeURIComponent(file.name)};base64,${base64Part}`;
+                    
+                    inputMessage.value = `[File: ${file.name} (${Math.round(file.size / 1024)} KB)]`;
                     inputMessage.readOnly = true;
-                    inputMessage.dataset.pdfData = dataUrl;
+                    inputMessage.dataset.fileData = customDataUrl;
                     pdfAddBtn.classList.add("active");
-                    pdfAddBtn.title = "Remove PDF file";
+                    pdfAddBtn.title = "Remove file";
                 };
                 reader.readAsDataURL(file);
             }
