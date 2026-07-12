@@ -2,10 +2,8 @@ const modal_container = document.querySelector(".modal_content");
 const encryptBtn = document.getElementById("encode");
 const inputMessage = document.getElementById("message");
 const inputPass = document.getElementById("pass");
-const existingResult = document.getElementById("dmessage")
+const existingResult = document.getElementById("dmessage");
 
-// Encode the password so special characters don't break the URL
-// const shareableLink = `${window.location.origin}/secret/${data.id}#${encodeURIComponent(pass)}`;
 if (encryptBtn) {
     encryptBtn.addEventListener("click", async (e) => {
         e.preventDefault();
@@ -25,10 +23,9 @@ if (encryptBtn) {
         try {
             const resultText = await encryptAESGCM(message, pass); // actual encryption performs from here 
             const encryptedText = resultText;
-            let exp = document.getElementById('expiry')
+            let exp = document.getElementById('expiry');
 
             // sending encryptedText to flask which will send encrypted text to database
-
             const data = await fetch('/secret', {
                 method: "POST",
                 headers: {
@@ -39,7 +36,7 @@ if (encryptBtn) {
                     'expiry': exp.value
                 })
             });
-            const result = await data.json()
+            const result = await data.json();
 
             if (result.id) {
                 const shareableLink = `${window.location.origin}/decoder?id=${result.id}#${btoa(encodeURIComponent(pass))}`;
@@ -54,19 +51,41 @@ if (encryptBtn) {
                     rawElement.textContent = encryptedText;
                 }
 
+                // Show metadata chips in the result
+                const expirySelect = document.getElementById("expiry");
+                const expiryChipText = document.getElementById("expiryChipText");
+                if (expirySelect && expiryChipText) {
+                    expiryChipText.textContent = "Expires in " + expirySelect.options[expirySelect.selectedIndex].text.toLowerCase().replace("expires in ", "");
+                }
+
+                const pwChip = document.getElementById("pwChip");
+                if (pwChip) {
+                    const pwPill = document.getElementById("pwPill");
+                    pwChip.style.display = (pwPill && pwPill.classList.contains("expanded") && inputPass.value) ? "flex" : "none";
+                }
+
+                const burnToggle = document.getElementById("burnToggle");
+                const burnChip = document.getElementById("burnChip");
+                if (burnChip) {
+                    burnChip.style.display = (burnToggle && burnToggle.classList.contains("on")) ? "flex" : "none";
+                }
+
+                const card = document.getElementById("card");
+                if (card) {
+                    card.classList.add("result-mode");
+                }
                 modal_container.classList.add("show");
                 bindModalButtons();
             }
         } catch (error) {
-            console.log("encryption failed ", error)
+            console.log("encryption failed ", error);
         }
-
     });
 }
+
 const emessage = document.getElementById("emessage");
 const decryptBtn = document.getElementById("decode");
 const password = document.getElementById("ePassword");
-
 
 function displayDecryptedMessage(decrypted_message) {
     const resultElement = document.getElementById("dmessage");
@@ -168,8 +187,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     const uid = urlParams.get('id'); // gets id if any presents 
     const hashPass = window.location.hash.substring(1);
 
-
-
     if (uid) {
         const response = await fetch(`/api/secret/${uid}`);
         const data = await response.json();
@@ -182,24 +199,38 @@ document.addEventListener("DOMContentLoaded", async () => {
         const message = data.emessage;
 
         if (hashPass) {
-
-            // user_pass = document.querySelector('#inp_password').textContent
-            const pass = atob(decodeURIComponent(hashPass)) // this decodes url ; %20 => space 
+            const pass = atob(decodeURIComponent(hashPass)); // this decodes url ; %20 => space 
             const decrypted_message = await decryptAESGCM(message, pass);
 
             displayDecryptedMessage(decrypted_message);
 
-            modal_container.classList.add("show");
+            const card = document.getElementById("card");
+            if (card) {
+                card.classList.add("result-mode");
+            }
+            if (modal_container) {
+                modal_container.classList.add("show");
+            }
             bindModalButtons(uid);
 
             // Clean the URL to hide the password from the address bar
             history.replaceState(null, null, ' ');
+        } else {
+            // Ciphertext is loaded but needs a password manually
+            const emsgInput = document.getElementById("emessage");
+            if (emsgInput) {
+                emsgInput.value = message;
+                emsgInput.readOnly = true;
+                emsgInput.placeholder = "Secret loaded. Enter password below to decrypt.";
+                emsgInput.style.opacity = "0.7";
+            }
+            const heroSub = document.querySelector("header.hero .sub");
+            if (heroSub) {
+                heroSub.textContent = "This secret is password-protected. Enter the decryption password below.";
+            }
         }
     }
-})
-
-
-
+});
 
 // manual decrypt btn
 if (decryptBtn) {
@@ -219,8 +250,16 @@ if (decryptBtn) {
 
             displayDecryptedMessage(decryptedMessage);
 
-            modal_container.classList.add("show");
-            bindModalButtons();
+            const card = document.getElementById("card");
+            if (card) {
+                card.classList.add("result-mode");
+            }
+            if (modal_container) {
+                modal_container.classList.add("show");
+            }
+            const urlParams = new URLSearchParams(window.location.search);
+            const uid = urlParams.get('id');
+            bindModalButtons(uid);
 
         } catch (error) {
             console.error("Decryption failed:", error);
@@ -228,7 +267,6 @@ if (decryptBtn) {
         }
     });
 }
-
 
 async function cleanData(uid) {
     if (!uid) return;
@@ -253,71 +291,198 @@ function bindModalButtons(uid = null) {
 
             navigator.clipboard.writeText(textToCopy).then(() => {
                 if (copiedSpan) {
-                    copiedSpan.innerText = "copied!";
+                    const originalText = btn.innerHTML;
+                    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>Copied';
                     setTimeout(() => {
-                        copiedSpan.innerText = "";
-                    }, 1000);
+                        btn.innerHTML = originalText;
+                    }, 1500);
                 }
             });
         };
     });
     if (closeBtn) {
         closeBtn.onclick = () => {
-            window.location = "/"
+            window.location = "/";
             cleanData(uid);
         };
     }
-
 }
 
 const globalCloseBtn = document.getElementById("close");
 if (globalCloseBtn) {
     globalCloseBtn.addEventListener("click", (e) => {
         e.preventDefault();
-        modal_container.classList.remove("show");
-
-
+        const card = document.getElementById("card");
+        if (card) {
+            card.classList.remove("result-mode");
+        }
+        if (modal_container) {
+            modal_container.classList.remove("show");
+        }
     });
 }
 
 if (modal_container) {
     modal_container.addEventListener("click", (e) => {
         if (e.target === modal_container) {
+            const card = document.getElementById("card");
+            if (card) {
+                card.classList.remove("result-mode");
+            }
             modal_container.classList.remove("show");
         }
     });
 }
-if (modal_container) {
-    document.addEventListener("keydown", (event) => {
-        if (event.key === "Escape") {
-            modal_container.classList.remove("show");
 
+document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+        const card = document.getElementById("card");
+        if (card) {
+            card.classList.remove("result-mode");
         }
-    })
-}
+        if (modal_container) {
+            modal_container.classList.remove("show");
+        }
+    }
+});
 
-const buttons = document.querySelectorAll(".switch-btn");
-const currentPath = window.location.pathname;
-buttons.forEach(btn => {
-    const mode = btn.dataset.mode.toLowerCase();
-    if ((currentPath === "/" && mode === "encrypt") || (currentPath.includes("decoder") && mode === "decrypt")) {
-        btn.classList.add("active");
+// Active Nav Link Logic
+document.addEventListener("DOMContentLoaded", () => {
+    const navLinks = document.querySelectorAll(".nav-link");
+    const currentPath = window.location.pathname;
+    navLinks.forEach(link => {
+        const href = link.getAttribute("href");
+        if ((currentPath === "/" && href === "/") || (currentPath.includes("decoder") && href.includes("decoder"))) {
+            link.classList.add("active");
+        } else {
+            link.classList.remove("active");
+        }
+    });
+});
+
+// ----- Tabs: text / file -----
+document.addEventListener("DOMContentLoaded", () => {
+    const tabs = document.querySelectorAll('.tab');
+    const inputMessage = document.getElementById('message');
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('pdf-select');
+
+    if (tabs.length && inputMessage && dropzone && fileInput) {
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                if (tab.dataset.tab === 'file') {
+                    inputMessage.style.display = 'none';
+                    dropzone.classList.add('active');
+                    runCipherPreview(fileInput.files[0] ? fileInput.files[0].name : "");
+                } else {
+                    inputMessage.style.display = 'block';
+                    dropzone.classList.remove('active');
+                    runCipherPreview(inputMessage.value);
+                }
+            });
+        });
     }
 
+    if (dropzone && fileInput && inputMessage) {
+        dropzone.addEventListener('click', () => {
+            fileInput.click();
+        });
 
-    btn.addEventListener("click", () => {
+        fileInput.addEventListener('change', () => {
+            const file = fileInput.files[0];
+            if (file) {
+                dropzone.querySelector('span').innerHTML = `<span class="browse">${file.name}</span> selected`;
+                
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const dataUrl = event.target.result;
+                    const mimeType = file.type || "application/octet-stream";
+                    const base64Part = dataUrl.split(",")[1];
+                    const customDataUrl = `data:${mimeType};name=${encodeURIComponent(file.name)};base64,${base64Part}`;
+                    
+                    inputMessage.value = `[File: ${file.name} (${Math.round(file.size / 1024)} KB)]`;
+                    inputMessage.dataset.fileData = customDataUrl;
+                    runCipherPreview(file.name);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
 
-        if ((currentPath === "/" && mode === "encrypt") || (currentPath.includes("decoder") && mode === "decrypt")) {
+    if (inputMessage) {
+        inputMessage.addEventListener('input', () => runCipherPreview(inputMessage.value));
+    }
+});
+
+// ----- Signature element: live cipher scramble preview -----
+const glyphs = '!<>-_\\/[]{}—=+*^?#$%';
+let scrambleTimer = null;
+
+function randomGlyphString(len){
+    let s = '';
+    for(let i=0;i<len;i++) s += glyphs[Math.floor(Math.random()*glyphs.length)];
+    return s;
+}
+
+function runCipherPreview(source){
+    const cipherText = document.getElementById('cipherText');
+    if (!cipherText) return;
+    clearTimeout(scrambleTimer);
+    if(!source){
+        cipherText.textContent = 'waiting for input…';
+        return;
+    }
+    const target = btoa(unescape(encodeURIComponent(source))).slice(0, 40);
+    let frame = 0;
+    const totalFrames = 10;
+    function tick(){
+        if(frame >= totalFrames){
+            cipherText.textContent = target + (source.length > 40 ? '…' : '');
             return;
         }
+        const revealCount = Math.floor((frame/totalFrames) * target.length);
+        let out = target.slice(0, revealCount) + randomGlyphString(Math.max(0, target.length - revealCount));
+        cipherText.textContent = out;
+        frame++;
+        scrambleTimer = setTimeout(tick, 35);
+    }
+    tick();
+}
 
-
-        if (mode === "encrypt") {
-            window.location.href = "/";
-        } else {
-            window.location.href = "/decoder";
+// ----- Password pill expand -----
+document.addEventListener("DOMContentLoaded", () => {
+    const pwPill = document.getElementById('pwPill');
+    if (pwPill) {
+        const pwInput = pwPill.querySelector('input');
+        pwPill.addEventListener('click', (e) => {
+            if(e.target.tagName !== 'INPUT'){
+                pwPill.classList.add('expanded');
+                if (pwInput) pwInput.focus();
+            }
+        });
+        if (pwInput) {
+            pwInput.addEventListener('blur', () => {
+                if(!pwInput.value) pwPill.classList.remove('expanded');
+            });
         }
-    });
+    }
+});
+
+// ----- Burn toggle -----
+document.addEventListener("DOMContentLoaded", () => {
+    const burnPill = document.getElementById('burnPill');
+    const burnToggle = document.getElementById('burnToggle');
+    const burnCheckbox = document.getElementById('burnToggleCheckbox');
+    if (burnPill && burnToggle) {
+        burnPill.addEventListener('click', () => {
+            burnToggle.classList.toggle('on');
+            if (burnCheckbox) {
+                burnCheckbox.checked = burnToggle.classList.contains('on');
+            }
+        });
+    }
 });
 
 //client side encryption 
@@ -368,8 +533,8 @@ async function encryptAESGCM(message, password) {
 
 //client side decryption
 async function decryptAESGCM(data, password) {
-    const encoder = new TextEncoder()
-    const decoder = new TextDecoder()
+    const encoder = new TextEncoder();
+    const decoder = new TextDecoder();
     // converts base 64 to bytes
     function fromBase64(base64) {
         const binary = atob(base64);
@@ -419,80 +584,3 @@ async function decryptAESGCM(data, password) {
 
     return decoder.decode(decrypted);
 }
-
-
-
-// Advanced Features Toggle Logic
-document.addEventListener("DOMContentLoaded", () => {
-    const advancedToggle = document.getElementById("advancedToggle");
-    const advancedFeatures = document.getElementById("advancedFeatures");
-
-    if (advancedToggle && advancedFeatures) {
-        advancedToggle.addEventListener("click", () => {
-            advancedToggle.classList.toggle("open");
-            if (advancedFeatures.style.display === "none") {
-                advancedFeatures.style.display = "flex";
-            } else {
-                advancedFeatures.style.display = "none";
-            }
-        });
-    }
-
-    // Toggle switch text logic
-    const burnToggle = document.getElementById("burnToggle");
-    const toggleText = document.querySelector(".toggle-text");
-    if (burnToggle && toggleText) {
-        burnToggle.addEventListener("change", () => {
-            toggleText.textContent = burnToggle.checked ? "ON" : "OFF";
-        });
-    }
-});
-
-// File selection logic
-document.addEventListener("DOMContentLoaded", () => {
-    const pdfAddBtn = document.getElementById("pdf-add-btn");
-    const pdfSelect = document.getElementById("pdf-select");
-    const inputMessage = document.getElementById("message");
-
-    if (pdfAddBtn && pdfSelect && inputMessage) {
-        pdfAddBtn.addEventListener("click", (e) => {
-            e.preventDefault();
-            if (pdfAddBtn.classList.contains("active")) {
-                // Clear selection
-                pdfSelect.value = "";
-                inputMessage.value = "";
-                inputMessage.readOnly = false;
-                delete inputMessage.dataset.fileData;
-                delete inputMessage.dataset.pdfData;
-                pdfAddBtn.classList.remove("active");
-                pdfAddBtn.title = "Add file";
-            } else {
-                // Trigger select
-                pdfSelect.click();
-            }
-        });
-
-        pdfSelect.addEventListener("change", (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    const dataUrl = event.target.result;
-                    
-                    // Construct custom data URL including the filename parameter
-                    const mimeType = file.type || "application/octet-stream";
-                    const base64Part = dataUrl.split(",")[1];
-                    const customDataUrl = `data:${mimeType};name=${encodeURIComponent(file.name)};base64,${base64Part}`;
-                    
-                    inputMessage.value = `[File: ${file.name} (${Math.round(file.size / 1024)} KB)]`;
-                    inputMessage.readOnly = true;
-                    inputMessage.dataset.fileData = customDataUrl;
-                    pdfAddBtn.classList.add("active");
-                    pdfAddBtn.title = "Remove file";
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-    }
-});
-

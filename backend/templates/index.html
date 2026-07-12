@@ -1,124 +1,136 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Securely encrypt your messages with DualCrypt — a modern encryption tool.">
-    <title>Encryption-Endec</title>
-    <link rel="stylesheet" href="{{url_for('static',filename='css/style.css')}}">
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
-        rel="stylesheet" />
+    <meta name="description" content="Securely encrypt your messages with Endec — a modern client-side encryption tool.">
+    <title>Endec — Encrypt anything. Share a link.</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
-
 <body>
-    <div class="logocontainer">
-        <h1>Endec</h1>
+
+<nav>
+    <div class="logo">Endec</div>
+    <div class="nav-links">
+        <a class="nav-link" href="https://github.com/prem-programs/Endec.git" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg>
+            Source
+        </a>
     </div>
-    <div class="card">
-        <form>
-            <label for="message">Enter your Secret</label>
-            <div class="textarea-wrapper">
-                <textarea id="message" name="message" rows="4" placeholder="Paste your message here"
-                    required></textarea>
-                <div class="pdf-btn-container">
-                    <button type="button" class="pdf-add-btn" id="pdf-add-btn" title="Add file">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="12" y1="5" x2="12" y2="19"></line>
-                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                    </button>
-                </div>
+    </div>
+</nav>
+
+<header class="hero">
+    <h1>Encrypt anything.<br>Share a <span class="em">link</span>, not a copy.</h1>
+    <p class="sub">Paste a message or drop a file. Endec locks it client-side and hands you one link — nothing is stored in the clear.</p>
+</header>
+
+<main>
+    <div class="card" id="card">
+        <div class="encrypt-form">
+            <div class="tabs">
+                <button class="tab active" data-tab="text" type="button">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+                    Message
+                </button>
+                <button class="tab" data-tab="file" type="button">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M13 2v7h7"/></svg>
+                    File
+                </button>
+            </div>
+
+            <div class="field-wrap">
+                <textarea id="message" placeholder="Type the message you want to encrypt…"></textarea>
+                
+                <label class="dropzone" id="dropzone" for="pdf-select">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+                    <span><span class="browse">Choose a file</span> or drag it here</span>
+                </label>
                 <input type="file" id="pdf-select" style="display: none;">
+                
+                <div class="cipher-strip" id="cipherStrip">
+                    <span class="lock-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+                    </span>
+                    <span id="cipherText">waiting for input…</span>
+                </div>
             </div>
 
-
-            <div class="advanced-toggle" id="advancedToggle">
-                <span class="advanced-section-title">ADVANCED PRIVACY FEATURES</span>
-                <svg id="advancedChevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16"
-                    color="currentColor" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                    stroke-linejoin="round">
-                    <path d="M6 9l6 6 6-6" />
-                </svg>
-            </div>
-
-            <div class="advanced-features" id="advancedFeatures" style="display: none;">
-                <div class="feature-item">
-                    <div class="password">
-                        <label for="password">Enter password</label>
-                        <input type="password" name="password" placeholder="•••••••••••" id="pass">
-                    </div>
-                    <label for="expiry">Expiry Time</label>
-                    <div class="select-wrapper">
-                        <select id="expiry" name="expiry">
-                            <option value="1">1 Hour</option>
-                            <option value="24">24 Hours</option>
-                            <option value="168">7 Days</option>
-                        </select>
-                        <svg class="select-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16"
-                            height="16" color="currentColor" fill="none" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M6 9l6 6 6-6" />
-                        </svg>
-                        <div class="feature-item">
-                            <label for="burnToggle">Burn-After-Reading</label>
-                            <div class="toggle-switch">
-                                <input type="checkbox" id="burnToggle" name="burnToggle" checked>
-                                <label for="burnToggle" class="toggle-label">
-                                    <span class="toggle-switch-handle"></span>
-                                </label>
-                                <span class="toggle-text">ON</span>
-                            </div>
-                        </div>
-                    </div>
+            <div class="options">
+                <div class="opt-pill" id="pwPill">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+                    <span class="opt-label">Add password</span>
+                    <input type="password" id="pass" placeholder="••••••••">
                 </div>
 
+                <div class="opt-pill">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+                    <select class="expiry" id="expiry" name="expiry">
+                        <option value="1">Expires in 1 hour</option>
+                        <option value="24">Expires in 24 hours</option>
+                        <option value="168">Expires in 7 days</option>
+                    </select>
+                </div>
 
+                <div class="opt-pill" id="burnPill">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 17a2.5 2.5 0 0 0 2.5-2.5c0-1.4-1-2-1-3.5 0 0 2 1 2 4a3.5 3.5 0 0 1-7 0c0-2.5 2-3 1.5-6C10 6 12 4 12 4s-1 3 1 5c1.5 1.5 2 3 2 5"/></svg>
+                    <span class="opt-label">Burn after reading</span>
+                    <div class="toggle-track on" id="burnToggle"><div class="toggle-dot"></div></div>
+                    <input type="checkbox" id="burnToggleCheckbox" checked style="display: none;">
+                </div>
             </div>
-            <button type="submit" id="encode">Encrypt</button>
-        </form>
 
-    </div>
+            <button class="cta" id="encode" type="button">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+                Encrypt &amp; create link
+            </button>
 
-    <div class="modal-container">
-        <div class="modal-content">
-            <div class="output">
-                <strong>Shareable Link: <br></strong>
-                <p id="shareable-link-p"></p>
-                <button class="copy-btn" data-target="shareable-link-p" data-span="copied-link"><svg
-                        xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="15" height="15"
-                        color="currentColor" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-                        stroke-linejoin="round">
-                        <path
-                            d="M7 11V9C7 5.70017 7 4.05025 8.02513 3.02513C9.05025 2 10.7002 2 14 2C17.2998 2 18.9497 2 19.9749 3.02513C21 4.05025 21 5.70017 21 9V11C21 14.2998 21 15.9497 19.9749 16.9749C18.9497 18 17.2998 18 14 18C10.7002 18 9.05025 18 8.02513 16.9749C7 15.9497 7 14.2998 7 11Z" />
-                        <path d="M3 6V15C3 18.2998 3 19.9497 4.02513 20.9749C5.05025 22 6.70017 22 10 22H17" />
-                    </svg></button>
+            <p class="footnote">Encryption happens on your device — Endec never sees the plaintext.</p>
+        </div>
+
+        <div class="result modal_content" id="result">
+            <div style="display:flex; align-items:center; gap:12px;">
+                <div class="result-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 6 9 17l-5-5"/></svg>
+                </div>
+                <div>
+                    <div class="result-title">Locked. Your link is ready.</div>
+                    <div class="result-sub">Share it — only someone with the link (and password, if set) can open it.</div>
+                </div>
+            </div>
+
+            <div class="link-box">
+                <span class="url mono" id="shareable-link-p">Generating...</span>
+                <button class="copy-btn" data-target="shareable-link-p" data-span="copied-link" id="copyBtn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                    Copy
+                </button>
                 <span class="copiedBtn" id="copied-link"></span>
             </div>
-            <div class="output" style="margin-top: 45px;">
-                <strong>RAW Encrypted Message: <br></strong>
-                <p id="raw-message-p"></p>
-                <button class="copy-btn" data-target="raw-message-p" data-span="copied-raw"><svg
-                        xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="15" height="15"
-                        color="currentColor" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-                        stroke-linejoin="round">
-                        <path
-                            d="M7 11V9C7 5.70017 7 4.05025 8.02513 3.02513C9.05025 2 10.7002 2 14 2C17.2998 2 18.9497 2 19.9749 3.02513C21 4.05025 21 5.70017 21 9V11C21 14.2998 21 15.9497 19.9749 16.9749C18.9497 18 17.2998 18 14 18C10.7002 18 9.05025 18 8.02513 16.9749C7 15.9497 7 14.2998 7 11Z" />
-                        <path d="M3 6V15C3 18.2998 3 19.9497 4.02513 20.9749C5.05025 22 6.70017 22 10 22H17" />
-                    </svg></button>
+
+            <div class="link-box" style="margin-top: 5px;">
+                <span class="url mono" id="raw-message-p" style="font-size: 11px; color: var(--text-secondary);">Ciphertext will appear here...</span>
+                <button class="copy-btn" data-target="raw-message-p" data-span="copied-raw" id="copyRawBtn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                    Copy RAW
+                </button>
                 <span class="copiedBtn" id="copied-raw"></span>
             </div>
-            <div>
-                <button id="close">close</button>
+
+            <div class="meta-row" id="metaRow">
+                <span class="meta-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg><span id="expiryChipText">Expires in 1 hour</span></span>
+                <span class="meta-chip" id="pwChip" style="display:none;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Password protected</span>
+                <span class="meta-chip" id="burnChip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 17a2.5 2.5 0 0 0 2.5-2.5c0-1.4-1-2-1-3.5 0 0 2 1 2 4a3.5 3.5 0 0 1-7 0c0-2.5 2-3 1.5-6C10 6 12 4 12 4s-1 3 1 5c1.5 1.5 2 3 2 5"/></svg>Burns after reading</span>
             </div>
+
+            <button class="new-btn" id="close">Encrypt another message</button>
         </div>
     </div>
+</main>
 
-
-    <script src="{{ url_for('static',filename='js/script.js')}}"></script>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
-
 </html>
