@@ -13,18 +13,36 @@ class Base(DeclarativeBase):
 db = SQLAlchemy(model_class=Base)
 app = Flask(__name__)
 
-# PostgreSQL Connection String Handling (Supports Railway's DATABASE_URL or individual env vars)
-db_url = os.getenv("DATABASE_URL") or os.getenv("POSTGRES_URL")
-if db_url:
-    if db_url.startswith("postgres://"):
-        db_url = db_url.replace("postgres://", "postgresql://", 1)
-else:
-    db_user = os.getenv("DB_USER", "postgres")
-    db_pass = os.getenv("DB_PASSWORD", "postgres")
-    db_host = os.getenv("DB_HOST", "localhost")
-    db_port = os.getenv("DB_PORT", "5432")
-    db_name = os.getenv("DB_NAME", "encrypter")
-    db_url = f"postgresql://{db_user}:{db_pass}@{db_host}:{db_port}/{db_name}"
+# PostgreSQL Connection String Handling (Supports Railway, Heroku, Render, or local SQLite)
+db_url = (
+    os.getenv("DATABASE_URL")
+    or os.getenv("DATABASE_PRIVATE_URL")
+    or os.getenv("DATABASE_PUBLIC_URL")
+    or os.getenv("POSTGRES_URL")
+    or os.getenv("POSTGRESQL_URL")
+)
+
+if not db_url and os.getenv("PGHOST"):
+    pghost = os.getenv("PGHOST")
+    pguser = os.getenv("PGUSER", "postgres")
+    pgpass = os.getenv("PGPASSWORD", "")
+    pgport = os.getenv("PGPORT", "5432")
+    pgdb = os.getenv("PGDATABASE", "railway")
+    db_url = f"postgresql://{pguser}:{pgpass}@{pghost}:{pgport}/{pgdb}"
+
+if not db_url:
+    db_user = os.getenv("DB_USER")
+    db_pass = os.getenv("DB_PASSWORD")
+    db_host = os.getenv("DB_HOST")
+    db_name = os.getenv("DB_NAME")
+    if db_user and db_pass and db_host and db_name:
+        db_url = f"postgresql://{db_user}:{db_pass}@{db_host}/{db_name}"
+    else:
+        # Fallback to SQLite so app never crashes if PostgreSQL is not yet linked in Railway
+        db_url = "sqlite:///encrypter.db"
+
+if db_url.startswith("postgres://"):
+    db_url = db_url.replace("postgres://", "postgresql://", 1)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -38,6 +56,10 @@ class Encryptedmessage(db.Model):
     emessage: Mapped[str] = mapped_column(Text)
 
 
-# Create tables
+# Create tables safely
 with app.app_context():
-    db.create_all()
+    try:
+        db.create_all()
+    except Exception as e:
+        print(f"Database initialization warning: {e}")
+
