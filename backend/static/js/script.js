@@ -82,6 +82,22 @@ if (encryptBtn) {
         }
     });
 }
+function existingFileBytes() {
+    const fileDataUrl = document.getElementById("message").dataset.fileData;
+    if (fileDataUrl) {
+        const base64Content = fileDataUrl.split(",")[1];
+        const binaryString = atob(base64Content);
+        const len = binaryString.length;
+        const bytes = new Uint8Array(len);
+        for (let i = 0; i < len; i++) {
+            bytes[i] = binaryString.charCodeAt(i);
+        }
+
+    }
+    return bytes
+}
+
+
 
 const emessage = document.getElementById("emessage");
 const decryptBtn = document.getElementById("decode");
@@ -185,48 +201,84 @@ document.addEventListener("DOMContentLoaded", async () => {
     // exact id from url
     const urlParams = new URLSearchParams(window.location.search);
     const uid = urlParams.get('id'); // gets id if any presents 
-    const hashPass = window.location.hash.substring(1);
+    const rawHash = window.location.hash.substring(1);
 
     if (uid) {
-        const response = await fetch(`/api/secret/${uid}`);
-        const data = await response.json();
-
-        if (!response.ok || data.error) {
-            alert(data.error || "Message could not be retrieved or was already destroyed.");
-            return;
+        const emsgInput = document.getElementById("emessage");
+        const heroSub = document.querySelector("header.hero .sub");
+        if (emsgInput) {
+            emsgInput.placeholder = "Fetching encrypted secret from server...";
         }
 
-        const message = data.emessage;
+        try {
+            const response = await fetch(`/api/secret/${uid}`);
+            const data = await response.json();
 
-        if (hashPass) {
-            const pass = atob(decodeURIComponent(hashPass)); // this decodes url ; %20 => space 
-            const decrypted_message = await decryptAESGCM(message, pass);
-
-            displayDecryptedMessage(decrypted_message);
-
-            const card = document.getElementById("card");
-            if (card) {
-                card.classList.add("result-mode");
+            if (!response.ok || data.error || !data.emessage) {
+                if (emsgInput) {
+                    emsgInput.placeholder = "Message could not be retrieved or was already destroyed.";
+                }
+                alert(data.error || data.message || "Message could not be retrieved or was already destroyed.");
+                return;
             }
-            if (modal_container) {
-                modal_container.classList.add("show");
-            }
-            bindModalButtons(uid);
 
-            // Clean the URL to hide the password from the address bar
-            history.replaceState(null, null, ' ');
-        } else {
-            // Ciphertext is loaded but needs a password manually
-            const emsgInput = document.getElementById("emessage");
+            const message = data.emessage;
             if (emsgInput) {
                 emsgInput.value = message;
                 emsgInput.readOnly = true;
-                emsgInput.placeholder = "Secret loaded. Enter password below to decrypt.";
-                emsgInput.style.opacity = "0.7";
+                emsgInput.style.opacity = "0.8";
             }
-            const heroSub = document.querySelector("header.hero .sub");
-            if (heroSub) {
-                heroSub.textContent = "This secret is password-protected. Enter the decryption password below.";
+
+            if (rawHash) {
+                let pass;
+                try {
+                    pass = decodeURIComponent(atob(rawHash));
+                } catch (e) {
+                    pass = decodeURIComponent(rawHash);
+                }
+
+                try {
+                    let decrypted_message;
+                    try {
+                        decrypted_message = await decryptAESGCM(message, pass);
+                    } catch (firstErr) {
+                        // Fallback attempt for raw un-base64 hash
+                        const rawPass = decodeURIComponent(rawHash);
+                        decrypted_message = await decryptAESGCM(message, rawPass);
+                    }
+
+                    displayDecryptedMessage(decrypted_message);
+
+                    const card = document.getElementById("card");
+                    if (card) {
+                        card.classList.add("result-mode");
+                    }
+                    if (modal_container) {
+                        modal_container.classList.add("show");
+                    }
+                    bindModalButtons(uid);
+
+                    // Clean the URL hash to hide password while keeping the valid path & query params
+                    history.replaceState(null, null, window.location.pathname + window.location.search);
+                } catch (err) {
+                    console.error("Auto-decryption failed with hash password:", err);
+                    if (heroSub) {
+                        heroSub.textContent = "Could not auto-decrypt with URL key. Please enter password manually below.";
+                    }
+                }
+            } else {
+                // Ciphertext is loaded but needs a password manually
+                if (emsgInput) {
+                    emsgInput.placeholder = "Secret loaded. Enter password below to decrypt.";
+                }
+                if (heroSub) {
+                    heroSub.textContent = "This secret is password-protected. Enter the decryption password below.";
+                }
+            }
+        } catch (fetchErr) {
+            console.error("Error fetching secret:", fetchErr);
+            if (emsgInput) {
+                emsgInput.placeholder = "Network error loading secret.";
             }
         }
     }
@@ -237,11 +289,11 @@ if (decryptBtn) {
     decryptBtn.addEventListener("click", async (e) => {
         e.preventDefault();
 
-        const messageText = emessage.value.trim();
-        const passText = password.value.trim();
+        const messageText = emessage ? emessage.value.trim() : "";
+        const passText = password ? password.value.trim() : "";
 
-        if (!messageText) {
-            alert("Please enter the encrypted message.");
+        if (!messageText || messageText === "Fetching encrypted secret from server...") {
+            alert("Please wait for the secret to load or paste an encrypted message.");
             return;
         }
 
@@ -301,25 +353,11 @@ function bindModalButtons(uid = null) {
         };
     });
     if (closeBtn) {
-        closeBtn.onclick = () => {
-            window.location = "/";
-            cleanData(uid);
+        closeBtn.onclick = (e) => {
+            if (uid) cleanData(uid);
+            window.location.href = "/";
         };
     }
-}
-
-const globalCloseBtn = document.getElementById("close");
-if (globalCloseBtn) {
-    globalCloseBtn.addEventListener("click", (e) => {
-        e.preventDefault();
-        const card = document.getElementById("card");
-        if (card) {
-            card.classList.remove("result-mode");
-        }
-        if (modal_container) {
-            modal_container.classList.remove("show");
-        }
-    });
 }
 
 if (modal_container) {
@@ -394,14 +432,14 @@ document.addEventListener("DOMContentLoaded", () => {
             const file = fileInput.files[0];
             if (file) {
                 dropzone.querySelector('span').innerHTML = `<span class="browse">${file.name}</span> selected`;
-                
+
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     const dataUrl = event.target.result;
                     const mimeType = file.type || "application/octet-stream";
                     const base64Part = dataUrl.split(",")[1];
                     const customDataUrl = `data:${mimeType};name=${encodeURIComponent(file.name)};base64,${base64Part}`;
-                    
+
                     inputMessage.value = `[File: ${file.name} (${Math.round(file.size / 1024)} KB)]`;
                     inputMessage.dataset.fileData = customDataUrl;
                     runCipherPreview(file.name);
@@ -420,29 +458,29 @@ document.addEventListener("DOMContentLoaded", () => {
 const glyphs = '!<>-_\\/[]{}—=+*^?#$%';
 let scrambleTimer = null;
 
-function randomGlyphString(len){
+function randomGlyphString(len) {
     let s = '';
-    for(let i=0;i<len;i++) s += glyphs[Math.floor(Math.random()*glyphs.length)];
+    for (let i = 0; i < len; i++) s += glyphs[Math.floor(Math.random() * glyphs.length)];
     return s;
 }
 
-function runCipherPreview(source){
+function runCipherPreview(source) {
     const cipherText = document.getElementById('cipherText');
     if (!cipherText) return;
     clearTimeout(scrambleTimer);
-    if(!source){
+    if (!source) {
         cipherText.textContent = 'waiting for input…';
         return;
     }
     const target = btoa(unescape(encodeURIComponent(source))).slice(0, 40);
     let frame = 0;
     const totalFrames = 10;
-    function tick(){
-        if(frame >= totalFrames){
+    function tick() {
+        if (frame >= totalFrames) {
             cipherText.textContent = target + (source.length > 40 ? '…' : '');
             return;
         }
-        const revealCount = Math.floor((frame/totalFrames) * target.length);
+        const revealCount = Math.floor((frame / totalFrames) * target.length);
         let out = target.slice(0, revealCount) + randomGlyphString(Math.max(0, target.length - revealCount));
         cipherText.textContent = out;
         frame++;
@@ -451,20 +489,20 @@ function runCipherPreview(source){
     tick();
 }
 
-// ----- Password pill expand -----
+// ----- Password  -----
 document.addEventListener("DOMContentLoaded", () => {
     const pwPill = document.getElementById('pwPill');
     if (pwPill) {
         const pwInput = pwPill.querySelector('input');
         pwPill.addEventListener('click', (e) => {
-            if(e.target.tagName !== 'INPUT'){
+            if (e.target.tagName !== 'INPUT') {
                 pwPill.classList.add('expanded');
                 if (pwInput) pwInput.focus();
             }
         });
         if (pwInput) {
             pwInput.addEventListener('blur', () => {
-                if(!pwInput.value) pwPill.classList.remove('expanded');
+                if (!pwInput.value) pwPill.classList.remove('expanded');
             });
         }
     }
