@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Securely decrypt your messages with Endec — a modern client-side decryption tool.">
-    <title>Decrypter-Endec</title>
+    <title>Decrypt Secret — Endec</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -13,10 +13,17 @@
 <body>
 
 <nav>
-    <div class="logo"><span>Endec
-    </span></div>
+    <div class="logo"><a href="/">Endec</a></div>
     <div class="nav-links">
-        <a class="nav-link" href="#" target="_blank">
+        <a class="nav-link" href="/">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+            Encrypt
+        </a>
+        <a class="nav-link active" href="/decrypter">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            Decrypt
+        </a>
+        <a class="nav-link" href="https://github.com/prem-programs/Endec.git" target="_blank">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg>
             Source
         </a>
@@ -24,13 +31,88 @@
 </nav>
 
 <header class="hero">
-    <h1>Decrypt your <span class="em">Secret</span>.</h1>
-    <p class="sub">Enter the encrypted ciphertext and password below to unlock and read your secure secret.</p>
+    <h1 id="decoderHeroTitle">Decrypt your <span class="em">Secret</span>.</h1>
+    <p class="sub" id="decoderHeroSub">Enter the encrypted ciphertext and password below to unlock and read your secure secret.</p>
 </header>
 
 <main>
     <div class="card" id="card">
-        <!-- Manual Decryption Form -->
+        <!-- Loading State -->
+        <div class="state-card" id="loadingState" style="display: none; text-align: center; padding: 24px 10px;">
+            <div class="spinner-ring"></div>
+            <div style="font-size: 15px; font-weight: 600; margin-top: 14px;">Retrieving secure secret…</div>
+            <div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">Checking server for encrypted payload…</div>
+        </div>
+
+        <!-- Password Prompt State (Required before decrypting when password was set) -->
+        <div class="state-card" id="passwordPromptState" style="display: none;">
+            <div style="display:flex; align-items:center; gap:12px; margin-bottom: 16px;">
+                <div class="result-icon lock-mode">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+                </div>
+                <div>
+                    <div class="result-title">Password Protected Secret</div>
+                    <div class="result-sub">Enter the sender's password to decrypt and view this data.</div>
+                </div>
+            </div>
+
+            <div class="meta-row" style="margin-bottom: 16px;">
+                <span class="meta-chip" id="pwPromptExpiryChip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg><span id="pwPromptExpiryText">Expires soon</span></span>
+                <span class="meta-chip" id="pwPromptBurnChip" style="display: none;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 17a2.5 2.5 0 0 0 2.5-2.5c0-1.4-1-2-1-3.5 0 0 2 1 2 4a3.5 3.5 0 0 1-7 0c0-2.5 2-3 1.5-6C10 6 12 4 12 4s-1 3 1 5c1.5 1.5 2 3 2 5"/></svg><span>Burns after reading</span></span>
+            </div>
+
+            <div class="field-wrap pw-field-wrap">
+                <input type="password" id="promptPasswordInput" placeholder="Enter password to unlock…" autocomplete="current-password" style="width: 100%; padding: 14px 44px 14px 16px; background: transparent; border: none; color: var(--text-primary); font-family: 'JetBrains Mono', monospace; font-size: 14px; outline: none;">
+                <button type="button" class="field-eye-btn" id="togglePromptEye" title="Show/Hide Password">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+            </div>
+
+            <div id="unlockError" class="unlock-error" style="display: none;"></div>
+
+            <button class="cta" id="promptUnlockBtn" type="button" style="margin-top: 16px;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                Unlock &amp; Decrypt
+            </button>
+        </div>
+
+        <!-- One-Time Reveal Confirmation State (When key in URL and burns on reading) -->
+        <div class="state-card" id="revealPromptState" style="display: none;">
+            <div style="display:flex; align-items:center; gap:12px; margin-bottom: 16px;">
+                <div class="result-icon flame-mode">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 17a2.5 2.5 0 0 0 2.5-2.5c0-1.4-1-2-1-3.5 0 0 2 1 2 4a3.5 3.5 0 0 1-7 0c0-2.5 2-3 1.5-6C10 6 12 4 12 4s-1 3 1 5c1.5 1.5 2 3 2 5"/></svg>
+                </div>
+                <div>
+                    <div class="result-title">One-Time Secret</div>
+                    <div class="result-sub">This secret can only be viewed once and will be burned from the server upon reveal.</div>
+                </div>
+            </div>
+
+            <div class="meta-row" style="margin-bottom: 18px;">
+                <span class="meta-chip" id="revealExpiryChip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg><span id="revealExpiryText">Expires soon</span></span>
+                <span class="meta-chip burn-chip-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 17a2.5 2.5 0 0 0 2.5-2.5c0-1.4-1-2-1-3.5 0 0 2 1 2 4a3.5 3.5 0 0 1-7 0c0-2.5 2-3 1.5-6C10 6 12 4 12 4s-1 3 1 5c1.5 1.5 2 3 2 5"/></svg>Destroys on reveal</span>
+            </div>
+
+            <button class="cta burn-cta" id="revealSecretBtn" type="button">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                Reveal Secret Now
+            </button>
+        </div>
+
+        <!-- Secret Expired or Already Burned State -->
+        <div class="state-card" id="unavailableState" style="display: none; text-align: center; padding: 20px 10px;">
+            <div class="result-icon destroyed-mode" style="margin: 0 auto 16px;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            </div>
+            <div class="result-title" style="font-size: 18px; text-align: center;" id="unavailableTitle">Secret Destroyed or Expired</div>
+            <div class="result-sub" style="font-size: 13.5px; margin-top: 8px; text-align: center;" id="unavailableSub">This secret has either expired or was already burned after being read. It cannot be recovered.</div>
+            <a href="/" class="cta" style="margin-top: 24px; text-decoration: none; display: inline-flex;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+                Encrypt a New Secret
+            </a>
+        </div>
+
+        <!-- Manual Decryption Form (When no ?id is specified) -->
         <div class="encrypt-form" id="manualDecryptForm">
             <div class="field-wrap">
                 <textarea id="emessage" placeholder="Paste the encrypted ciphertext here…"></textarea>
@@ -45,12 +127,12 @@
             <div class="options">
                 <div class="opt-pill expanded" id="pwPill">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
-                    <input type="password" id="ePassword" placeholder="Enter password to decrypt" style="display: block; width: 100%;">
+                    <input type="password" id="ePassword" placeholder="Enter password (if required)" style="display: block; width: 100%;">
                 </div>
             </div>
 
             <button class="cta" id="decode" type="button">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                 Decrypt Secret
             </button>
         </div>
@@ -58,12 +140,12 @@
         <!-- Decrypted Result State -->
         <div class="result modal_content" id="result">
             <div style="display:flex; align-items:center; gap:12px;">
-                <div class="result-icon">
+                <div class="result-icon unlocked-mode">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                 </div>
                 <div>
                     <div class="result-title">Decrypted Secret</div>
-                    <div class="result-sub">The message was successfully unlocked client-side.</div>
+                    <div class="result-sub" id="resultStatusSub">The secret was successfully unlocked client-side.</div>
                 </div>
             </div>
 
@@ -71,7 +153,12 @@
                 <div class="decoder-box" id="dmessage"></div>
             </div>
 
-            <div class="meta-row" style="margin-top: 10px;">
+            <div class="meta-row" style="margin-top: 12px;">
+                <span class="meta-chip" id="resultBurnBadge" style="display:none;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 17a2.5 2.5 0 0 0 2.5-2.5c0-1.4-1-2-1-3.5 0 0 2 1 2 4a3.5 3.5 0 0 1-7 0c0-2.5 2-3 1.5-6C10 6 12 4 12 4s-1 3 1 5c1.5 1.5 2 3 2 5"/></svg><span id="resultBurnBadgeText">Burned from server</span></span>
+                <span class="meta-chip" id="resultExpiryBadge" style="display:none;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg><span id="resultExpiryBadgeText"></span></span>
+            </div>
+
+            <div class="meta-row" style="margin-top: 12px;">
                 <button class="copy-btn" data-target="dmessage" data-span="copied-decrypted" id="copyDecryptedBtn">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
                     Copy Plaintext
@@ -79,7 +166,7 @@
                 <span class="copiedBtn" id="copied-decrypted"></span>
             </div>
 
-            <button class="new-btn" id="close" style="margin-top: 15px; width: 100%;">Close / Go Home</button>
+            <a href="/" class="new-btn" id="close" style="margin-top: 15px; width: 100%; display: block; text-align: center; text-decoration: none;">Encrypt a New Message</a>
         </div>
     </div>
 </main>

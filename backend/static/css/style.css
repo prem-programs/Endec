@@ -50,8 +50,16 @@ nav{
   display:flex;
   align-items:center;
   gap:8px;
+  cursor: pointer;
+
 }
 .logo .bracket{ color: var(--accent); }
+
+.logo a{
+  text-decoration: none;
+  color: inherit;
+}
+
 .nav-links{
   display:flex;
   align-items:center;
@@ -253,20 +261,35 @@ textarea::placeholder{ color: var(--text-tertiary); }
 }
 .opt-pill:hover{ border-color: var(--border-hover); color: var(--text-primary); }
 .opt-pill svg{ width:14px; height:14px; flex-shrink:0; }
-.opt-pill.expanded{ border-color: var(--border-hover); }
+.opt-pill.expanded, .opt-pill.active{ border-color: var(--accent-dim); color: var(--text-primary); background: rgba(63,224,197,0.06); }
+.opt-pill.has-password{ border-color: var(--violet); background: rgba(139,124,246,0.08); color: var(--text-primary); }
 
-.opt-pill input[type=password]{
+.opt-pill input[type=password], .opt-pill input[type=text]{
   background:transparent;
   border:none;
   outline:none;
   color: var(--text-primary);
   font-family:'JetBrains Mono', monospace;
-  font-size:12.5px;
-  width:110px;
-  display:none;
+  font-size:12px;
+  width:130px;
 }
-.opt-pill.expanded input[type=password]{ display:block; }
+.opt-pill .pw-inline-box{ display: none; align-items: center; gap: 4px; }
+.opt-pill.expanded .pw-inline-box{ display: flex !important; }
 .opt-pill.expanded .opt-label{ display:none; }
+
+.opt-eye-btn, .field-eye-btn{
+  background: transparent;
+  border: none;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  padding: 2px 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color .15s ease;
+}
+.opt-eye-btn:hover, .field-eye-btn:hover{ color: var(--text-primary); }
+.opt-eye-btn svg, .field-eye-btn svg{ width: 14px; height: 14px; }
 
 select.expiry{
   background:transparent;
@@ -501,6 +524,115 @@ select.expiry option{ background: var(--bg-card); color: var(--text-primary); }
   word-break: break-all;
   white-space: pre-wrap;
   text-align: left;
+}
+
+/* Decoder States & Unlocking */
+.state-card {
+  display: flex;
+  flex-direction: column;
+  animation: rise .35s ease;
+}
+
+.pw-field-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.field-eye-btn {
+  position: absolute;
+  right: 12px;
+  background: transparent;
+  border: none;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color .15s ease;
+}
+.field-eye-btn:hover {
+  color: var(--text-primary);
+}
+.field-eye-btn svg {
+  width: 17px;
+  height: 17px;
+}
+
+.unlock-error {
+  margin-top: 12px;
+  padding: 10px 14px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  border-radius: 8px;
+  color: #f87171;
+  font-size: 13px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: shake 0.3s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+.spinner-ring {
+  width: 38px;
+  height: 38px;
+  border: 3px solid rgba(63, 224, 197, 0.15);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 8px auto 0;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Result and Prompt Icon Variations */
+.result-icon.lock-mode {
+  background: rgba(139, 124, 246, 0.15);
+  border-color: rgba(139, 124, 246, 0.3);
+  color: var(--violet);
+}
+
+.result-icon.flame-mode {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: rgba(245, 158, 11, 0.3);
+  color: #f59e0b;
+}
+
+.result-icon.destroyed-mode {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+}
+
+.result-icon.unlocked-mode {
+  background: var(--accent-glow);
+  border-color: rgba(63, 224, 197, 0.3);
+  color: var(--accent);
+}
+
+.burn-chip-badge {
+  color: #f59e0b;
+  border-color: rgba(245, 158, 11, 0.3);
+  background: rgba(245, 158, 11, 0.08);
+}
+
+.cta.burn-cta {
+  background: linear-gradient(135deg, #f59e0b, #ef4444);
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.25);
+}
+.cta.burn-cta:hover {
+  background: linear-gradient(135deg, #fbbf24, #f87171);
 }
 
 @media (max-width: 480px){

@@ -1,0 +1,266 @@
+[33mcommit a9a864be2c9069fd190cf0f7cf8a3513ce0189d4[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: prem-programs <premolearn@gmail.com>
+Date:   Fri Aug 14 23:43:46 2026 +0530
+
+    feat: initialize Flask-SQLAlchemy database connection with model definition and environment-based configuration
+
+[33mcommit e694cb8d4ead31eea866f3c2876c62960e292732[m
+Author: prem-programs <premolearn@gmail.com>
+Date:   Fri Aug 14 23:38:39 2026 +0530
+
+    preparing for railway production deployment
+
+[33mcommit ad9c81d4d5d176ab0d1ce74d573620f3480c597e[m[33m ([m[1;31morigin/ui_updates[m[33m, [m[1;32mui_updates[m[33m)[m
+Author: prem-programs <premolearn@gmail.com>
+Date:   Sun Jul 12 20:33:25 2026 +0530
+
+    updated ui ux
+
+[33mcommit 5b77553e34047efff84f175e867384ea52a42ddc[m
+Author: prem-programs <premolearn@gmail.com>
+Date:   Sun Jul 12 00:49:16 2026 +0530
+
+    ui updates
+
+[33mcommit d0e81a9053fa9e3d663bedd645f8cd85fbe7caf0[m
+Author: prem-programs <premolearn@gmail.com>
+Date:   Fri Jul 10 23:46:01 2026 +0530
+
+    minimal fixes
+
+[33mcommit f0f39ea447c56d43ab63bc0e46c313c7b36b0477[m
+Author: prem-programs <premolearn@gmail.com>
+Date:   Tue Jul 7 11:46:26 2026 +0530
+
+    main changes
+
+[33mcommit e0f5eec17529190533b69d33fca6b9244bcf50e6[m
+Author: prem-programs <premolearn@gmail.com>
+Date:   Tue Jul 7 11:44:41 2026 +0530
+
+    Timer included to delte message after some time from database
+
+[33mcommit f53dbc764837028d078dffc14ebf5eaeb1337185[m
+Author: prem-programs <premolearn@gmail.com>
+Date:   Tue Jun 30 00:20:07 2026 +0530
+
+    some naming and minimal changes
+
+[33mcommit 184a6466c586b72a70feb0ccdc8514fbf0de2d30[m
+Author: prem-programs <premolearn@gmail.com>
+Date:   Mon Jun 29 20:33:23 2026 +0530
+
+    requirements updated
+
+[33mcommit 854ff93b057c8a39ed725c1c96bf82ea2e723a5f[m
+Author: prem-programs <premolearn@gmail.com>
+Date:   Wed Jun 3 21:15:14 2026 +0530
+
+    switched sqlite to postgresql
+
+[33mcommit 74d1a619343458bb5297b9f083fe3e56d995c690[m
+Merge: 6d35702 048253a
+Author: prem-programs <premolearn@gmail.com>
+Date:   Fri May 29 19:10:17 2026 +0530
+
+    Merge branch 'main' of https://github.com/prem-programs/encrypt-decrypt
+
+[33mcommit 6d3570221823e74f2a408ae537f2993b55b7a49d[m
+Author: prem-programs <premolearn@gmail.com>
+Date:   Fri May 29 19:10:14 2026 +0530
+
+    cleaning for deployment
+
+[33mcommit 048253a2bfa4af3fad28dda2db40f3effbb286b7[m
+Author: Prem jha <premolearn@gmail.com>
+Date:   Thu May 28 22:55:03 2026 +0530
+
+    minimal readme update
+
+[33mcommit ca4d07daa39aeb6f9eadc6c26986e1622be3e07b[m
+Merge: 40f474f 0975e2c
+Author: prem-programs <premolearn@gmail.com>
+Date:   Thu May 28 11:54:44 2026 +0530
+
+    Merge branch 'main' of https://github.com/prem-programs/encrypt-decrypt
+
+[33mcommit 40f474f61b9a2401c65e25b33eeb3f86cc286f8d[m
+Author: prem-programs <premolearn@gmail.com>
+Date:   Thu May 28 11:54:41 2026 +0530
+
+    Readme update
+
+[33mcommit 0975e2cb10c286a77d10b26260424501d3483936[m
+Merge: 21cd519 3b92385
+Author: Prem jha <premolearn@gmail.com>
+Date:   Thu May 28 11:18:30 2026 +0530
+
+    Merge pull request #3 from prem-programs/urlC
+    
+    added feature : Shareable link
+
+[33mcommit 3b923853fa4cd724b8fad8ce4fa0db9d07f3f5ee[m[33m ([m[1;31morigin/urlC[m[33m, [m[1;32murlC[m[33m)[m
+Author: prem-programs <premolearn@gmail.com>
+Date:   Thu May 28 11:03:36 2026 +0530
+
+    replaced space with strong password
+
+[33mcommit 474ee4c82a9b2261cd6bbbf6797790d322378658[m
+Author: prem-programs <premolearn@gmail.com>
+Date:   Thu May 28 10:45:46 2026 +0530
+
+    added shareable url feature
+
+[33mcommit baf18dcae4338c583e37a06b483382e27e37c10d[m
+Author: prem-programs <premolearn@gmail.com>
+Date:   Sat May 23 23:55:33 2026 +0530
+
+    shareable link added with working decrypting
+
+[33mcommit 59253403e4c7e12a712193050e34333db9c6041e[m
+Author: prem-programs <premolearn@gmail.com>
+Date:   Sun May 17 19:02:05 2026 +0530
+
+    auto cleanup database after  5s(experimental only)
+
+[33mcommit 21cd5191bc10a2777040ab7a397325578d700346[m
+Author: Prem jha <premolearn@gmail.com>
+Date:   Sun May 10 20:44:49 2026 +0530
+
+    updated reame
+
+[33mcommit fea9fd2a8fc53ffb8dbaed2383bb30171d6f0ec1[m
+Merge: af9a2a8 7a7bb17
+Author: Prem jha <premolearn@gmail.com>
+Date:   Sun May 10 20:10:09 2026 +0530
+
+    Merge pull request #2 from prem-programs/e2ejs
+    
+    switched from python to End to end encryption using javascript
+
+[33mcommit 7a7bb173d0e9059b69646c8344913832cc326543[m[33m ([m[1;31morigin/e2ejs[m[33m, [m[1;32me2ejs[m[33m)[m
+Author: prem-programs <premolearn@gmail.com>
+Date:   Sun May 10 20:06:45 2026 +0530
+
+    minimal changes ux
+
+[33mcommit f3b59f09d94aa298d6b203e5966db4675667eb75[m
+Author: prem-programs <premolearn@gmail.com>
+Date:   Fri May 8 20:24:04 2026 +0530
+
+    converted encryption from server side encryption to client side with upgraded ui
+
+[33mcommit 583bbbfe72a0a5e2fe7b8aefe1a471b619e78368[m
+Author: prem-programs <premolearn@gmail.com>
+Date:   Mon May 4 00:05:29 2026 +0530
+
+    client side encryption added
+
+[33mcommit af9a2a8a65e4e8811422a4231aa2faa0d29c7bf2[m
+Merge: cc77ad2 c395e08
+Author: Prem jha <premolearn@gmail.com>
+Date:   Sun May 3 16:12:57 2026 +0530
+
+    Merge pull request #1 from prem-programs/e2ejs
+    
+    mobile-ui bug fixed
+
+[33mcommit c395e084e4054dc3a30fa56387acd7da9f7b8dc3[m
+Author: prem-programs <premolearn@gmail.com>
+Date:   Sun May 3 16:11:03 2026 +0530
+
+    mobile-ui bug fixed
+
+[33mcommit cc77ad2a8765553116c94da060aa84ad8bda9894[m[33m ([m[1;32mcheckout[m[33m)[m
+Author: prem-programs <premolearn@gmail.com>
+Date:   Sat May 2 22:46:51 2026 +0530
+
+    making responsive for mobile
+
+[33mcommit e70517ee4dbb846a412ff9f333e8947d2face50b[m
+Author: prem-programs <prem667@gmail.com>
+Date:   Sat May 2 17:12:36 2026 +0530
+
+    debug removed
+
+[33mcommit b615bf9d455804c6ba2e680ea057725d1834838d[m
+Author: prem-programs <prem667@gmail.com>
+Date:   Sat May 2 17:11:45 2026 +0530
+
+    ui improved
+
+[33mcommit a1d3989e3171d4501030490e7d0dfddcc75a7204[m
+Author: prem-programs <prem667@gmail.com>
+Date:   Fri May 1 13:03:37 2026 +0530
+
+    modal ui fixed
+
+[33mcommit 09dceb8ce422e2376b4785fa5446a25fe77f0cdf[m
+Author: prem-programs <prem667@gmail.com>
+Date:   Thu Apr 30 20:34:46 2026 +0530
+
+    removing debug
+
+[33mcommit 02fea7d42884b1a69580313abbc81600d6dc3161[m
+Author: prem-programs <prem667@gmail.com>
+Date:   Thu Apr 30 20:33:40 2026 +0530
+
+    added modal popup
+
+[33mcommit 3ce50510143b9a66ba482016243eb296bc471132[m
+Author: Prem Jha <premolearn@gmail.com>
+Date:   Fri Mar 13 00:50:05 2026 +0530
+
+    bug fixes
+
+[33mcommit b2c74fdb54dfcbbffa484e45f89b8b59ee421103[m
+Author: Prem Jha <premolearn@gmail.com>
+Date:   Fri Mar 13 00:49:22 2026 +0530
+
+    improved responsivity and bug fixes
+
+[33mcommit c41e4241b590aba67984b693bfc4b2dea2a4db91[m
+Author: Prem Jha <premolearn@gmail.com>
+Date:   Thu Mar 12 10:15:23 2026 +0530
+
+    Added copy button using javascript
+
+[33mcommit 99ea4806311cb550afbe5022bd5948983ce5909e[m
+Merge: 42d9b5e 15da61a
+Author: Prem Jha <premolearn@gmail.com>
+Date:   Sat Feb 7 22:22:22 2026 +0530
+
+    Merge branch 'main' of https://github.com/prem-programs/encrypt-decrypt
+
+[33mcommit 42d9b5e198a8122101590a85ba5d7a2384c7a689[m
+Merge: 89dcf0f b1088ab
+Author: Prem Jha <premolearn@gmail.com>
+Date:   Sat Feb 7 22:22:18 2026 +0530
+
+    readme update
+
+[33mcommit 15da61a2c26a6d9ec33ff918cf94fa2fd669c0b3[m
+Author: Prem jha <premolearn@gmail.com>
+Date:   Thu Feb 5 22:17:13 2026 +0530
+
+    Add viewport meta tag to decoder.html
+
+[33mcommit 6bfc58f023b8faab5641d7cb5e2e8aa4ceff97b5[m
+Author: Prem jha <premolearn@gmail.com>
+Date:   Thu Feb 5 22:16:52 2026 +0530
+
+    Add viewport meta tag for responsive design
+
+[33mcommit 89dcf0fd38f6c7327cbc847e79ff5f7d93f43419[m
+Author: Prem Jha <premolearn@gmail.com>
+Date:   Thu Feb 5 22:13:19 2026 +0530
+
+    responsive bug fix
+
+[33mcommit b1088ab2f64990fa87a14c9d0542688bd6d69997[m
+Author: Prem jha <premolearn@gmail.com>
+Date:   Thu Feb 5 17:55:04 2026 +0530
+
+    Revise README for Encrypt-Decrypt Web App
+    
+    Updated README to include project details, features, de

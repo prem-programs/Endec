@@ -13,13 +13,20 @@
 <body>
 
 <nav>
-    <div class="logo">Endec</div>
+    <div class="logo"><a href="/">Endec</a></div>
     <div class="nav-links">
+        <a class="nav-link active" href="/">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+            Encrypt
+        </a>
+        <a class="nav-link" href="/decrypter">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            Decrypt
+        </a>
         <a class="nav-link" href="https://github.com/prem-programs/Endec.git" target="_blank">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg>
             Source
         </a>
-    </div>
     </div>
 </nav>
 
@@ -60,24 +67,29 @@
             </div>
 
             <div class="options">
-                <div class="opt-pill" id="pwPill">
+                <div class="opt-pill" id="pwPill" title="Click to require a password">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
-                    <span class="opt-label">Add password</span>
-                    <input type="password" id="pass" placeholder="••••••••">
+                    <span class="opt-label" id="pwLabel">Add password</span>
+                    <div class="pw-inline-box" style="display: none; align-items: center; gap: 4px;">
+                        <input type="password" id="pass" placeholder="Enter password…" autocomplete="new-password">
+                        <button type="button" class="opt-eye-btn" id="togglePwEye" title="Show/Hide Password">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </button>
+                    </div>
                 </div>
 
-                <div class="opt-pill">
+                <div class="opt-pill" id="expiryPill">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
-                    <select class="expiry" id="expiry" name="expiry">
+                    <select class="expiry" id="expiry" name="expiry" title="Select secret expiration time">
                         <option value="1">Expires in 1 hour</option>
                         <option value="24">Expires in 24 hours</option>
                         <option value="168">Expires in 7 days</option>
                     </select>
                 </div>
 
-                <div class="opt-pill" id="burnPill">
+                <div class="opt-pill" id="burnPill" title="Toggle self-destruct after reading">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 17a2.5 2.5 0 0 0 2.5-2.5c0-1.4-1-2-1-3.5 0 0 2 1 2 4a3.5 3.5 0 0 1-7 0c0-2.5 2-3 1.5-6C10 6 12 4 12 4s-1 3 1 5c1.5 1.5 2 3 2 5"/></svg>
-                    <span class="opt-label">Burn after reading</span>
+                    <span class="opt-label" id="burnLabel">Burn after reading</span>
                     <div class="toggle-track on" id="burnToggle"><div class="toggle-dot"></div></div>
                     <input type="checkbox" id="burnToggleCheckbox" checked style="display: none;">
                 </div>
@@ -97,8 +109,8 @@
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 6 9 17l-5-5"/></svg>
                 </div>
                 <div>
-                    <div class="result-title">Locked. Your link is ready.</div>
-                    <div class="result-sub">Share it — only someone with the link (and password, if set) can open it.</div>
+                    <div class="result-title" id="resultTitle">Locked. Your link is ready.</div>
+                    <div class="result-sub" id="resultSub">Share it — only someone with the link (and password, if set) can open it.</div>
                 </div>
             </div>
 
@@ -122,8 +134,8 @@
 
             <div class="meta-row" id="metaRow">
                 <span class="meta-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg><span id="expiryChipText">Expires in 1 hour</span></span>
-                <span class="meta-chip" id="pwChip" style="display:none;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Password protected</span>
-                <span class="meta-chip" id="burnChip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 17a2.5 2.5 0 0 0 2.5-2.5c0-1.4-1-2-1-3.5 0 0 2 1 2 4a3.5 3.5 0 0 1-7 0c0-2.5 2-3 1.5-6C10 6 12 4 12 4s-1 3 1 5c1.5 1.5 2 3 2 5"/></svg>Burns after reading</span>
+                <span class="meta-chip" id="pwChip" style="display:none;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span id="pwChipText">Password protected</span></span>
+                <span class="meta-chip" id="burnChip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 17a2.5 2.5 0 0 0 2.5-2.5c0-1.4-1-2-1-3.5 0 0 2 1 2 4a3.5 3.5 0 0 1-7 0c0-2.5 2-3 1.5-6C10 6 12 4 12 4s-1 3 1 5c1.5 1.5 2 3 2 5"/></svg><span id="burnChipText">Burns after reading</span></span>
             </div>
 
             <button class="new-btn" id="close">Encrypt another message</button>
