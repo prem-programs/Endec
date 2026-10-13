@@ -540,7 +540,67 @@ function bindModalButtons(uid = null) {
             });
         };
     });
+
+    // Encrypt another message / Reset button
+    const closeBtn = document.getElementById("close");
+    if (closeBtn) {
+        closeBtn.onclick = (e) => {
+            // If on decoder page with link href, let default navigation happen
+            if (closeBtn.tagName === "A") return;
+
+            e.preventDefault();
+            const card = document.getElementById("card");
+            if (card) card.classList.remove("result-mode");
+            if (modal_container) modal_container.classList.remove("show");
+
+            if (inputMessage) {
+                inputMessage.value = "";
+                delete inputMessage.dataset.fileData;
+                delete inputMessage.dataset.pdfData;
+                inputMessage.style.display = "block";
+            }
+            if (inputPass) {
+                inputPass.value = "";
+                const pwPill = document.getElementById("pwPill");
+                if (pwPill) pwPill.classList.remove("expanded", "has-password");
+            }
+            const fileInput = document.getElementById("pdf-select");
+            if (fileInput) fileInput.value = "";
+            const dropzone = document.getElementById("dropzone");
+            if (dropzone) {
+                dropzone.classList.remove("active");
+                const dropSpan = dropzone.querySelector("span");
+                if (dropSpan) dropSpan.innerHTML = '<span class="browse">Choose a file</span> or drag it here';
+            }
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(t => {
+                if (t.dataset.tab === 'text') t.classList.add('active');
+                else t.classList.remove('active');
+            });
+            runCipherPreview("");
+            if (inputMessage) inputMessage.focus();
+        };
+    }
 }
+
+// Global modal dismiss listeners
+if (modal_container) {
+    modal_container.addEventListener("click", (e) => {
+        if (e.target === modal_container) {
+            const card = document.getElementById("card");
+            if (card) card.classList.remove("result-mode");
+            modal_container.classList.remove("show");
+        }
+    });
+}
+
+document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+        const card = document.getElementById("card");
+        if (card) card.classList.remove("result-mode");
+        if (modal_container) modal_container.classList.remove("show");
+    }
+});
 
 // ----------------- NAVIGATION ACTIVE LINK LOGIC -----------------
 document.addEventListener("DOMContentLoaded", () => {
