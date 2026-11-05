@@ -2,13 +2,23 @@ from flask import render_template, request, jsonify
 from backend.db import db, Encryptedmessage, app
 from datetime import datetime, timezone, timedelta
 
+def _ensure_utc(dt):
+    """Ensure a datetime object is timezone-aware in UTC."""
+    if dt is None:
+        return None
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone(timezone.utc)
+
 def purge_expired():
     """Purge expired records from the database."""
     try:
         now = datetime.now(timezone.utc)
+        # Handle both PostgreSQL (aware) and SQLite (naive string/timestamp)
+        now_naive = now.replace(tzinfo=None)
         db.session.query(Encryptedmessage).filter(
             Encryptedmessage.expires_at.isnot(None),
-            Encryptedmessage.expires_at < now
+            (Encryptedmessage.expires_at < now) | (Encryptedmessage.expires_at < now_naive)
         ).delete(synchronize_session=False)
         db.session.commit()
     except Exception as e:
@@ -77,8 +87,11 @@ def get_secret(uid):
             "error": "Secret not found or has already been destroyed."
         }), 404
 
+    expires_at = _ensure_utc(enc_message.expires_at)
+    created_at = _ensure_utc(enc_message.created_at)
+
     # Check if this secret has expired
-    if enc_message.expires_at and enc_message.expires_at < now:
+    if expires_at and expires_at < now:
         try:
             db.session.delete(enc_message)
             db.session.commit()
@@ -96,8 +109,8 @@ def get_secret(uid):
         "emessage": enc_message.emessage,
         "has_password": bool(enc_message.has_password),
         "burn_after_reading": bool(enc_message.burn_after_reading),
-        "created_at": enc_message.created_at.isoformat() if enc_message.created_at else None,
-        "expires_at": enc_message.expires_at.isoformat() if enc_message.expires_at else None
+        "created_at": created_at.isoformat() if created_at else None,
+        "expires_at": expires_at.isoformat() if expires_at else None
     })
 
 @app.route('/api/secret/<int:uid>/burn', methods=['POST', 'DELETE'])
@@ -112,4 +125,8 @@ def cleanup(uid):
         except Exception as e:
             db.session.rollback()
             return jsonify({"error": str(e)}), 500
-    return jsonify({"message": "Not found or already burned", "success": False}), 404
+    return jsonify({"message": "Not found or already burned", "success": False}), 404
+
+@app.route('/api/pdf/<uid>')
+def encrypt_pdf(uid:int):
+        
