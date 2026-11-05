@@ -49,11 +49,6 @@ if db_url.startswith("postgres://"):
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
-    "DATABASE_URL", 
-    "postgresql://postgres:password@localhost:5432/endec"
-)
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 STORAGE_DIR = os.path.join(os.getcwd(), "ephemeral_storage")
 os.makedirs(STORAGE_DIR, exist_ok=True)
 
@@ -62,6 +57,7 @@ db.init_app(app)
 # Create tables safely and ensure new columns exist
 with app.app_context():
     try:
+        import backend.models  # Register models before create_all
         db.create_all()
         with db.engine.connect() as conn:
             if db.engine.name == "postgresql":

@@ -1,7 +1,10 @@
-from flask import render_template, request, jsonify
-from backend.db import db, app
+from flask import render_template, request, jsonify,send_file
+from backend.db import db, app, STORAGE_DIR
 from backend.models import Encryptedmessage,EncryptedFileRecord
 from datetime import datetime, timezone, timedelta
+from backend.pdf_endec import encrypt_pdf,decrypt_pdf
+import uuid
+import os
 
 def _ensure_utc(dt):
     """Ensure a datetime object is timezone-aware in UTC."""
@@ -128,6 +131,79 @@ def cleanup(uid):
             return jsonify({"error": str(e)}), 500
     return jsonify({"message": "Not found or already burned", "success": False}), 404
 
-# @app.route('/api/pdf/<uid>')
-# def encrypt_pdf(uid:int):
-        
+# User A uploads -> Server encrypts -> Saves UUID in Postgres -> Returns link
+@app.route('/api/upload-pdf', methods=['POST'])
+def upload_pdf():
+    file = request.files.get("file")
+    password = request.form.get('password')
+
+
+    if not file or not password:
+        return jsonify({"error": "Both a PDF file and a password are required."}), 400
+
+    if not file.filename.lower().endswith('.pdf'):
+        return jsonify({"error": "Provide pdf file only."}), 400
+
+    try:
+        file_id = str(uuid.uuid4())
+        dest_path = os.path.join(STORAGE_DIR, f"{file_id}.pdf")
+        encrypt_pdf(file, dest_path, password)
+
+        record = EncryptedFileRecord(
+            id=file_id,
+            original_filename=file.filename,
+            disk_path=dest_path
+        )
+        db.session.add(record)
+        db.session.commit()
+
+        # shareable dynamic url 
+        download_url = f"{request.host_url}api/download/{file_id}"
+
+        return jsonify({
+            "success": True,
+            "id": file_id,
+            "link": download_url
+        })
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": f"Encryption Failed | {e}"}), 500
+
+@app.route("/api/download/<file_id>", methods=['GET'])
+def download_pdf(file_id):
+    record = db.session.get(EncryptedFileRecord, file_id)
+
+    if not record or not os.path.exists(record.disk_path):
+        return jsonify({"error": "This file has already been downloaded and destroyed, or it never existed."}), 404
+    
+    disk_path = record.disk_path
+    download_name = f"encrypted_{record.original_filename}"
+
+    try:
+        db.session.delete(record)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+
+    # Stream the binary to the receiver
+    response = send_file(
+        disk_path,
+        as_attachment=True,
+        download_name=download_name,
+        mimetype="application/pdf"
+    )
+
+    # Delete physical file from disk as soon as the stream finishes
+    @response.call_on_close
+    def cleanup():
+        if os.path.exists(disk_path):
+            try:
+                os.remove(disk_path)
+            except OSError as err:
+                print(f"Error purging file: {err}")
+
+    return response
+
+
+
