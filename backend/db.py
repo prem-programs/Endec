@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 from dotenv import load_dotenv
 import os
 
+
 load_dotenv()
 class Base(DeclarativeBase):
     pass
@@ -48,18 +49,15 @@ if db_url.startswith("postgres://"):
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
+    "DATABASE_URL", 
+    "postgresql://postgres:password@localhost:5432/endec"
+)
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+STORAGE_DIR = os.path.join(os.getcwd(), "ephemeral_storage")
+os.makedirs(STORAGE_DIR, exist_ok=True)
+
 db.init_app(app)
-
-# Define Models
-class Encryptedmessage(db.Model):
-    __tablename__ = "encrypted_message"
-    id: Mapped[int] = mapped_column(primary_key=True)
-    emessage: Mapped[str] = mapped_column(Text)
-    created_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
-    expires_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
-    burn_after_reading: Mapped[bool] = mapped_column(Boolean, default=True)
-    has_password: Mapped[bool] = mapped_column(Boolean, default=False)
-
 
 # Create tables safely and ensure new columns exist
 with app.app_context():

@@ -1,5 +1,6 @@
 from flask import render_template, request, jsonify
-from backend.db import db, Encryptedmessage, app
+from backend.db import db, app
+from backend.models import Encryptedmessage,EncryptedFileRecord
 from datetime import datetime, timezone, timedelta
 
 def _ensure_utc(dt):
@@ -127,6 +128,6 @@ def cleanup(uid):
             return jsonify({"error": str(e)}), 500
     return jsonify({"message": "Not found or already burned", "success": False}), 404
 
-@app.route('/api/pdf/<uid>')
-def encrypt_pdf(uid:int):
+# @app.route('/api/pdf/<uid>')
+# def encrypt_pdf(uid:int):
         
