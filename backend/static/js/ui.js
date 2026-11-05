@@ -178,6 +178,19 @@ function _resetEncryptForm() {
         if (sp) sp.innerHTML = '<span class="browse">Choose a file</span> or drag it here';
     }
 
+    const pdfForm = document.getElementById('pdfUploadForm');
+    if (pdfForm) {
+        pdfForm.reset();
+        pdfForm.style.display = 'none';
+        const pdfStatus = document.getElementById('pdfStatus');
+        if (pdfStatus) {
+            pdfStatus.innerHTML = '<span class="browse">Choose a PDF file</span> or drag it here';
+        }
+    }
+
+    const standardWrap = document.getElementById('standardEncryptWrap');
+    if (standardWrap) standardWrap.style.display = 'block';
+
     document.querySelectorAll('.tab').forEach(t => {
         t.classList.toggle('active', t.dataset.tab === 'text');
     });

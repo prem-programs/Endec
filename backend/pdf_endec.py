@@ -1,6 +1,7 @@
 from pypdf import PdfReader, PdfWriter
 import os
 
+
 def encrypt_pdf(input_pdf, out_file_path: str, password: str = None):
     """
     Encrypts a PDF with AES-256-R5.
