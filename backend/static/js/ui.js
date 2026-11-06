@@ -171,21 +171,19 @@ function _resetEncryptForm() {
     const fileInput = document.getElementById('pdf-select');
     if (fileInput) fileInput.value = '';
 
+    const rawMessageBox = document.getElementById('rawMessageBox');
+    if (rawMessageBox) rawMessageBox.hidden = false;
+
+    ['expiryPill', 'burnPill'].forEach(id => {
+        const option = document.getElementById(id);
+        if (option) option.hidden = false;
+    });
+
     const dropzone = document.getElementById('dropzone');
     if (dropzone) {
         dropzone.classList.remove('active');
         const sp = dropzone.querySelector('span');
         if (sp) sp.innerHTML = '<span class="browse">Choose a file</span> or drag it here';
-    }
-
-    const pdfForm = document.getElementById('pdfUploadForm');
-    if (pdfForm) {
-        pdfForm.reset();
-        pdfForm.style.display = 'none';
-        const pdfStatus = document.getElementById('pdfStatus');
-        if (pdfStatus) {
-            pdfStatus.innerHTML = '<span class="browse">Choose a PDF file</span> or drag it here';
-        }
     }
 
     const standardWrap = document.getElementById('standardEncryptWrap');

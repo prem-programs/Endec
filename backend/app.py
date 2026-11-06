@@ -205,5 +205,10 @@ def download_pdf(file_id):
 
     return response
 
+@app.route("/api/steg/",methods=['POST'])
+def ste_image():
+    img = request.form.image
+    enc_message = request.enc_message
+
 
 

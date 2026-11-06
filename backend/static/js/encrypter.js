@@ -69,14 +69,28 @@ function initExpiryPill() {
     });
 }
 
-// ── Message ↔ File tabs ───────────────────────────────────────────────────────
+function isPdfFile(file) {
+    return file.name.toLowerCase().endsWith('.pdf');
+}
+
+// ── Message ↔ File tabs ──────────────────────────────────────────────────────
 function initTabs() {
     const tabs      = document.querySelectorAll('.tab');
     const msgInput  = document.getElementById('message');
     const dropzone  = document.getElementById('dropzone');
     const fileInput = document.getElementById('pdf-select');
+    const expiryPill = document.getElementById('expiryPill');
+    const burnPill = document.getElementById('burnPill');
 
     if (!tabs.length || !msgInput || !dropzone || !fileInput) return;
+
+    function updatePdfOptions() {
+        const isFileTab = document.querySelector('.tab.active')?.dataset.tab === 'file';
+        const isPdf = isFileTab && fileInput.files[0] && isPdfFile(fileInput.files[0]);
+        [expiryPill, burnPill].forEach(option => {
+            if (option) option.hidden = Boolean(isPdf);
+        });
+    }
 
     tabs.forEach(tab => {
         tab.addEventListener('click', () => {
@@ -92,6 +106,7 @@ function initTabs() {
                 dropzone.classList.remove('active');
                 runCipherPreview(msgInput.value);
             }
+            updatePdfOptions();
         });
     });
 
@@ -100,25 +115,48 @@ function initTabs() {
     fileInput.addEventListener('change', () => {
         const file = fileInput.files[0];
         if (!file) return;
+        delete msgInput.dataset.fileData;
 
-        dropzone.querySelector('span').innerHTML =
-            `<span class="browse">${file.name}</span> selected (${Math.round(file.size / 1024)} KB)`;
+        const label = dropzone.querySelector('span');
+        if (label) {
+            const browseLabel = document.createElement('span');
+            browseLabel.className = 'browse';
+            browseLabel.textContent = file.name;
+            label.replaceChildren(
+                browseLabel,
+                document.createTextNode(` selected (${Math.round(file.size / 1024)} KB)`)
+            );
+        }
+
+        runCipherPreview(file.name);
+        updatePdfOptions();
+
+        if (isPdfFile(file)) {
+            return;
+        }
 
         const reader = new FileReader();
         reader.onload = ev => {
-            const dataUrl   = ev.target.result;
+            if (fileInput.files[0] !== file) return;
+            const dataUrl   = String(ev.target.result || '');
             const mimeType  = file.type || 'application/octet-stream';
             const base64    = dataUrl.split(',')[1];
+            if (!base64) {
+                alert('Could not read the selected file.');
+                return;
+            }
             const customUrl = `data:${mimeType};name=${encodeURIComponent(file.name)};base64,${base64}`;
 
-            msgInput.value            = `[File: ${file.name} (${Math.round(file.size / 1024)} KB)]`;
             msgInput.dataset.fileData = customUrl;
-            runCipherPreview(file.name);
+        };
+        reader.onerror = () => {
+            if (fileInput.files[0] === file) alert('Could not read the selected file.');
         };
         reader.readAsDataURL(file);
     });
 
     msgInput.addEventListener('input', () => runCipherPreview(msgInput.value));
+    updatePdfOptions();
 }
 
 // ── Encrypt button ────────────────────────────────────────────────────────────
@@ -126,28 +164,53 @@ function initEncryptButton() {
     const btn      = document.getElementById('encode');
     const msgInput = document.getElementById('message');
     const passInput = document.getElementById('pass');
+    const fileInput = document.getElementById('pdf-select');
 
     if (!btn) return;
 
-    btn.addEventListener('click', async e => {
+    btn.addEventListener('click', async (e) => {
         e.preventDefault();
 
-        const message      = msgInput?.dataset.fileData || msgInput?.dataset.pdfData || msgInput?.value.trim() || '';
+        const isFileTab = document.querySelector('.tab.active')?.dataset.tab === 'file';
+        const selectedFile = isFileTab ? fileInput?.files?.[0] || null : null;
+        const pdfFile = selectedFile && isPdfFile(selectedFile) ? selectedFile : null;
+        const message = isFileTab
+            ? msgInput?.dataset.fileData || msgInput?.dataset.pdfData || ''
+            : msgInput?.value.trim() || '';
         const rawPass      = passInput?.value.trim() || '';
         const hasCustomPass = Boolean(rawPass);
         const pass         = rawPass || generateRandomKey();
 
-        if (!message) {
+        if (!pdfFile && !message) {
             alert('Please enter a message or attach a file.');
             msgInput?.focus();
             return;
         }
 
+        if (pdfFile && !rawPass) {
+            alert('Please add a password to protect this PDF. The recipient will need it to open the downloaded PDF.');
+            document.getElementById('pwPill')?.classList.add('expanded');
+            passInput?.focus();
+            return;
+        }
+
+        if (selectedFile && !pdfFile && !msgInput?.dataset.fileData) {
+            alert('Please wait for the selected file to finish loading, then try again.');
+            return;
+        }
+
         const origHtml = btn.innerHTML;
         btn.disabled = true;
-        btn.innerHTML = '<span class="spinner-ring" style="width:16px;height:16px;margin:0;border-width:2px;display:inline-block;vertical-align:middle;margin-right:8px;"></span> Encrypting client-side…';
+        btn.innerHTML = pdfFile
+            ? '<span class="spinner-ring" style="width:16px;height:16px;margin:0;border-width:2px;display:inline-block;vertical-align:middle;margin-right:8px;"></span> Encrypting PDF…'
+            : '<span class="spinner-ring" style="width:16px;height:16px;margin:0;border-width:2px;display:inline-block;vertical-align:middle;margin-right:8px;"></span> Encrypting client-side…';
 
         try {
+            if (pdfFile) {
+                await encryptPdfFile(pdfFile, rawPass);
+                return;
+            }
+
             const cipherText = await encryptAESGCM(message, pass);
 
             const expSelect = document.getElementById('expiry');
@@ -188,7 +251,9 @@ function initEncryptButton() {
 function _populateResultModal(shareLink, cipherText, hasCustomPass, isBurn, expSelect) {
     const modal = document.querySelector('.modal_content');
     const card  = document.getElementById('card');
+    const rawMessageBox = document.getElementById('rawMessageBox');
 
+    if (rawMessageBox) rawMessageBox.hidden = false;
     document.getElementById('shareable-link-p')?.setAttribute !== undefined &&
         (document.getElementById('shareable-link-p').textContent = shareLink);
 
