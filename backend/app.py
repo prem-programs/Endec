@@ -3,8 +3,11 @@ from backend.db import db, app, STORAGE_DIR
 from backend.models import Encryptedmessage,EncryptedFileRecord
 from datetime import datetime, timezone, timedelta
 from backend.pdf_endec import encrypt_pdf,decrypt_pdf
+from backend.stegano import  encode_message,decode_message
 import uuid
 import os
+import requests
+
 
 def _ensure_utc(dt):
     """Ensure a datetime object is timezone-aware in UTC."""
@@ -72,6 +75,7 @@ def secret():
         db.session.commit()
         return jsonify({
             "id": emsg.id,
+            "message": emsg.emessage,
             "has_password": emsg.has_password,
             "burn_after_reading": emsg.burn_after_reading,
             "expires_at": emsg.expires_at.isoformat() if emsg.expires_at else None
@@ -205,10 +209,105 @@ def download_pdf(file_id):
 
     return response
 
-@app.route("/api/steg/",methods=['POST'])
+# image + message => image & message enc => 
+@app.route("api/steg/enc", methods=['POST'])
 def ste_image():
-    img = request.form.image
-    enc_message = request.enc_message
+    s_img = request.files.get("image") or request.files.get("s_img")
+    s_message = request.form.get("message") or request.form.get("s_message")
+
+    if not s_message and request.is_json:
+        data = request.get_json(silent=True) or {}
+        s_message = data.get("s_message") or data.get("message")
+
+    if not s_message:
+        return jsonify({"error": "Provide message"}), 400
+
+    # encrypting using /secret endpoint
+    with app.test_client() as client:
+        response = client.post(
+            "/secret",
+            json={
+                "message": s_message,
+                "expiry": 1,
+                "burn": True,
+                "has_password": False
+            }
+        )
+        result = response.get_json()
+
+    
+    secret_message = result.get("message")
+
+    if s_img:
+        input_image_path = os.path.join(STORAGE_DIR, f"temp_{uuid.uuid4().hex}.png")
+        s_img.save(input_image_path)
+    else:
+        input_image_path = "image.png"
+
+    output_image_path = os.path.join(STORAGE_DIR, f"encoded_{result.get('id')}.png")
+    encode_message(input_image_path, secret_message, output_image_path)
+
+    if s_img and os.path.exists(input_image_path):
+        os.remove(input_image_path)
+
+    return jsonify({
+        "success": True,
+        "id": result.get("id"),
+        "encoded_image": output_image_path,
+        "result": result
+    }), 200
+
+
+# image => encrypted message => decrypt => message 
+@app.route("api/steg/enc", methods=['POST'])
+def ste_image():
+    s_img = request.files.get("image") or request.files.get("s_img")
+    s_message = request.form.get("message") or request.form.get("s_message")
+
+    if not s_message and request.is_json:
+        data = request.get_json(silent=True) or {}
+        s_message = data.get("s_message") or data.get("message")
+
+    if not s_message:
+        return jsonify({"error": "Provide message"}), 400
+
+    # encrypting using /secret endpoint
+    with app.test_client() as client:
+        response = client.post(
+            "/secret",
+            json={
+                "message": s_message,
+                "expiry": 1,
+                "burn": True,
+                "has_password": False
+            }
+        )
+        result = response.get_json()
+
+    
+    secret_message = result.get("message")
+
+    if s_img:
+        input_image_path = os.path.join(STORAGE_DIR, f"temp_{uuid.uuid4().hex}.png")
+        s_img.save(input_image_path)
+    else:
+        input_image_path = "image.png"
+
+    output_image_path = os.path.join(STORAGE_DIR, f"encoded_{result.get('id')}.png")
+    encode_message(input_image_path, secret_message, output_image_path)
+
+    if s_img and os.path.exists(input_image_path):
+        os.remove(input_image_path)
+
+    return jsonify({
+        "success": True,
+        "id": result.get("id"),
+        "encoded_image": output_image_path,
+        "result": result
+    }), 200
+
+
+
 
 
 
