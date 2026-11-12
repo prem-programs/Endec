@@ -210,7 +210,7 @@ def download_pdf(file_id):
     return response
 
 # image + message => image & message enc => 
-@app.route("api/steg/enc", methods=['POST'])
+@app.route("/api/steg/enc", methods=['POST'])
 def ste_image():
     s_img = request.files.get("image") or request.files.get("s_img")
     s_message = request.form.get("message") or request.form.get("s_message")
@@ -236,7 +236,7 @@ def ste_image():
         result = response.get_json()
 
     
-    secret_message = result.get("message")
+    uid_payload = result.get("id")
 
     if s_img:
         input_image_path = os.path.join(STORAGE_DIR, f"temp_{uuid.uuid4().hex}.png")
@@ -244,70 +244,57 @@ def ste_image():
     else:
         input_image_path = "image.png"
 
-    output_image_path = os.path.join(STORAGE_DIR, f"encoded_{result.get('id')}.png")
-    encode_message(input_image_path, secret_message, output_image_path)
+    output_image_path = os.path.join(STORAGE_DIR, f"encoded_{uid_payload}.png")
+    encode_message(input_image_path, f"{uid_payload}", output_image_path)
 
-    if s_img and os.path.exists(input_image_path):
+    # Clean up input file to free disk space
+    if os.path.exists(input_image_path):
         os.remove(input_image_path)
 
     return jsonify({
         "success": True,
-        "id": result.get("id"),
+        "id": uid_payload,
         "encoded_image": output_image_path,
         "result": result
     }), 200
 
 
-# image => encrypted message => decrypt => message 
-@app.route("api/steg/enc", methods=['POST'])
-def ste_image():
-    s_img = request.files.get("image") or request.files.get("s_img")
-    s_message = request.form.get("message") or request.form.get("s_message")
-
-    if not s_message and request.is_json:
-        data = request.get_json(silent=True) or {}
-        s_message = data.get("s_message") or data.get("message")
-
-    if not s_message:
-        return jsonify({"error": "Provide message"}), 400
-
-    # encrypting using /secret endpoint
-    with app.test_client() as client:
-        response = client.post(
-            "/secret",
-            json={
-                "message": s_message,
-                "expiry": 1,
-                "burn": True,
-                "has_password": False
-            }
-        )
-        result = response.get_json()
-
+# image => extract hidden message => return decoded message
+@app.route("/api/steg/dec", methods=['POST'])
+def ste_message():
     
-    secret_message = result.get("message")
+    img = request.files.get("image") or request.files.get("img")
 
-    if s_img:
-        input_image_path = os.path.join(STORAGE_DIR, f"temp_{uuid.uuid4().hex}.png")
-        s_img.save(input_image_path)
+    if img:
+        temp_path = os.path.join(STORAGE_DIR, f"dec_input_{uuid.uuid4().hex}.png")
+        img.save(temp_path)
+        image_path = temp_path
+    elif uid:
+        image_path = os.path.join(STORAGE_DIR, f"encoded_{uid}.png")
+        temp_path = None
     else:
-        input_image_path = "image.png"
+        return jsonify({"error": "Provide an image file or a valid uid"}), 400
 
-    output_image_path = os.path.join(STORAGE_DIR, f"encoded_{result.get('id')}.png")
-    encode_message(input_image_path, secret_message, output_image_path)
+    if not os.path.exists(image_path):
+        return jsonify({"error": "Image file not found"}), 404
 
-    if s_img and os.path.exists(input_image_path):
-        os.remove(input_image_path)
+    try:
+        decoded_message = decode_message(image_path)
+    except Exception as e:
+        return jsonify({"error": f"Failed to decode image: {e}"}), 400
+    finally:
+        if temp_path and os.path.exists(temp_path):
+            os.remove(temp_path)
+
+    secret_data = None
+    if uid:
+        with app.test_client() as client:
+            res = client.get(f"/api/secret/{uid}")
+            if res.status_code == 200:
+                secret_data = res.get_json()
 
     return jsonify({
         "success": True,
-        "id": result.get("id"),
-        "encoded_image": output_image_path,
-        "result": result
+        "decoded_message": decoded_message,
+        "secret": secret_data
     }), 200
-
-
-
-
-
-
