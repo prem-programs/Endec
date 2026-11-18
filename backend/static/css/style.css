@@ -51,6 +51,10 @@
   background: transparent;
 }
 
+button, input, select, textarea {
+  font-family: inherit;
+}
+
 html{ -webkit-font-smoothing: antialiased; }
 
 body{
@@ -629,17 +633,33 @@ select.expiry option{ background: var(--bg-card); color: var(--text-primary); }
 .result.show{ display:flex; }
 .card.result-mode .encrypt-form{ display:none; }
 
+.result-header{
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  text-align: left;
+}
+
 .result-icon{
   width:38px; height:38px;
+  min-width:38px; min-height:38px;
+  max-width:38px; max-height:38px;
   border-radius:10px;
   background: var(--accent-glow);
   border:1px solid rgba(63,224,197,0.25);
   display:flex; align-items:center; justify-content:center;
   color: var(--accent);
+  flex-shrink: 0;
+  margin-top: 1px;
 }
 .result-icon svg{ width:18px; height:18px; }
-.result-title{ font-size:15px; font-weight:700; text-align: left; margin-bottom: 0px; }
-.result-sub{ font-size:13px; color: var(--text-secondary); margin-top:2px; text-align: left; }
+.result-text-block{
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.result-title{ font-size:15.5px; font-weight:700; text-align: left; color: var(--text-primary); line-height: 1.35; }
+.result-sub{ font-size:13px; color: var(--text-secondary); margin-top:4px; text-align: left; line-height: 1.5; }
 
 .link-box{
   display:flex;
@@ -676,6 +696,105 @@ select.expiry option{ background: var(--bg-card); color: var(--text-primary); }
 .copy-btn:hover{ border-color: var(--border-hover); }
 .copy-btn svg{ width:12px; height:12px; }
 
+/* Steganography Result Download Card */
+.steg-download-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+  transition: border-color 0.15s ease;
+}
+
+.steg-download-card:hover {
+  border-color: var(--border-hover);
+}
+
+.steg-download-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
+}
+
+.steg-download-icon {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  border-radius: 8px;
+  background: var(--accent-glow);
+  border: 1px solid rgba(63, 224, 197, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.steg-download-icon svg {
+  width: 17px;
+  height: 17px;
+}
+
+.steg-download-meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 2px;
+  text-align: left;
+}
+
+.steg-download-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.steg-download-badge {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  letter-spacing: 0.02em;
+}
+
+.steg-dl-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: linear-gradient(135deg, var(--accent-dim), var(--accent));
+  color: #08090b !important;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 7px;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px var(--accent-glow);
+}
+
+.steg-dl-action-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px var(--accent-glow);
+  background: var(--accent);
+}
+
+.steg-dl-action-btn:active {
+  transform: translateY(0);
+}
+
+.steg-dl-action-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
 .meta-row{
   display:flex;
   gap:8px;
@@ -693,17 +812,31 @@ select.expiry option{ background: var(--bg-card); color: var(--text-primary); }
 .meta-chip svg{ width:12px; height:12px; }
 
 .new-btn{
-  background:transparent;
-  border:1px dashed var(--border-hover);
+  font-family: inherit;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
   color: var(--text-secondary);
-  font-size:12.5px;
-  font-weight:600;
-  padding:11px;
-  border-radius:9px;
-  cursor:pointer;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 11px 18px;
+  border-radius: 9px;
+  cursor: pointer;
   transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
 }
-.new-btn:hover{ color: var(--text-primary); border-color: var(--text-tertiary); }
+.new-btn:hover{
+  color: var(--text-primary);
+  border-color: var(--border-hover);
+  background: rgba(255, 255, 255, 0.06);
+  transform: translateY(-1px);
+}
+.new-btn:active{
+  transform: translateY(0);
+}
 
 /* File download component styling */
 .pdf-download-container {
