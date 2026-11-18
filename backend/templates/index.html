@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=7">
 </head>
 <body>
 
@@ -32,7 +32,6 @@
 
 <header class="hero">
     <h1>Encrypt anything.<br>Share a <span class="em">link</span>, not a copy.</h1>
-    <p class="sub">Encrypt messages and files, including PDFs, and share them with a link.</p>
 </header>
 
 <main>
@@ -41,33 +40,55 @@
             <div class="tabs">
                 <button class="tab active" data-tab="text" type="button">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
-                    Message
+                    Payload     
                 </button>
-                <button class="tab" data-tab="file" type="button">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M13 2v7h7"/></svg>
-                    File
+                <button class="tab" data-tab="image" type="button">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                    Stego
                 </button>
             </div>
 
             <div id="standardEncryptWrap">
-                <div class="field-wrap">
-                    <textarea id="message" placeholder="Type the message you want to encrypt…"></textarea>
+                <div class="field-wrap" id="fieldWrap">
+                    <div class="message-input-container" id="messageInputContainer">
+                        <!-- Dedicated file attachment card up above the text -->
+                        <div id="filePill" class="file-pill" style="display: none;">
+                            <div class="file-pill-left">
+                                <span class="file-pill-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                                </span>
+                                <div class="file-pill-meta">
+                                    <span id="filePillName" class="file-pill-name"></span>
+                                    <span class="file-pill-sub">Encrypted in payload</span>
+                                </div>
+                            </div>
+                            <button type="button" id="removeFileBtn" class="file-pill-remove" title="Remove attached file">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                            </button>
+                        </div>
 
-                    <label class="dropzone" id="dropzone" for="pdf-select">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
-                        <span><span class="browse">Choose a file</span> or drag it here</span>
-                    </label>
+                        <div id="message" class="message-input" contenteditable="true" role="textbox" aria-multiline="true" data-placeholder="Type the message you want to encrypt…"></div>
+                    </div>
+
                     <input type="file" id="pdf-select" style="display: none;">
 
                     <div class="cipher-strip" id="cipherStrip">
-                        <span class="lock-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
-                        </span>
-                        <span id="cipherText">waiting for input…</span>
+                        <div class="cipher-left">
+                            <span class="lock-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+                            </span>
+                            <span id="cipherText">waiting for input…</span>
+                        </div>
+                        <div class="input-actions-bar" id="inputActionsBar">
+                            <label class="attach-btn" for="pdf-select" title="Attach file (PDF, image, doc)" id="attachBtn">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                <span class="attach-btn-text">Attach file</span>
+                            </label>
+                        </div>
                     </div>
                 </div>
 
-                <div class="options">
+                <div class="options" id="optionsContainer">
                     <div class="opt-pill" id="pwPill" title="Click to require a password">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
                         <span class="opt-label" id="pwLabel">Add password</span>
@@ -95,61 +116,104 @@
                         <input type="checkbox" id="burnToggleCheckbox" checked style="display: none;">
                     </div>
                 </div>
+            </div>
+
+            <!-- Steganography Image Encrypt Wrap (Active in Image tab) -->
+            <div id="stegEncryptWrap" style="display: none;">
+                <!-- Cover Image Card (Top) -->
+                <div class="steg-cover-card" id="stegCoverCard">
+                    <div class="steg-cover-left">
+                        <div class="steg-cover-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                <circle cx="8.5" cy="8.5" r="1.5"/>
+                                <polyline points="21 15 16 10 5 21"/>
+                            </svg>
+                        </div>
+                        <div class="steg-cover-text">
+                            <div class="steg-cover-title">
+                                <span id="stegCoverTitleText">Drop cover image</span> <span class="steg-cover-formats">(JPG, PNG, WebP)</span>
+                            </div>
+                        
+                        </div>
+                    </div>
+                    <button type="button" class="steg-sample-btn" id="loadSampleCoverBtn">Load Sample Cover</button>
+                    <input type="file" id="steg-select" accept="image/png, image/jpeg, image/jpg, image/webp" style="display: none;">
+                </div>
+
+                <!-- Secret Message Card (Bottom) -->
+                <div class="steg-message-card" id="stegMessageCard">
+                    <textarea id="stegMessage" class="steg-textarea" placeholder="Type secret message to bind to this image..."></textarea>
+                    <div class="steg-footer-strip">
+                        <span class="steg-footer-left">POINTER LSB · EDEC1 (5B) + UID (12B) + CRC (2B)</span>
+                        <span class="steg-footer-right" id="stegBoundBytes">0 B bound</span>
+                    </div>
+                </div>
+            </div>
 
                 <button class="cta" id="encode" type="button">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
                     Encrypt &amp; create link
                 </button>
 
-                <p class="footnote">Messages and regular files are encrypted on your device. PDFs are uploaded for PDF-level password encryption; share the password separately from the one-time download link.</p>
             </div>
 
-        </div>
-
-        <div class="result modal_content" id="result">
-            <div style="display:flex; align-items:center; gap:12px;">
-                <div class="result-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 6 9 17l-5-5"/></svg>
+            <div class="result modal_content" id="result">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div class="result-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 6 9 17l-5-5"/></svg>
+                    </div>
+                    <div>
+                        <div class="result-title" id="resultTitle">Locked. Your link is ready.</div>
+                        <div class="result-sub" id="resultSub">Share it — only someone with the link (and password, if set) can open it.</div>
+                    </div>
                 </div>
-                <div>
-                    <div class="result-title" id="resultTitle">Locked. Your link is ready.</div>
-                    <div class="result-sub" id="resultSub">Share it — only someone with the link (and password, if set) can open it.</div>
+
+                <div class="link-box" id="imageDownloadBox" style="display: none; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; align-items: center; gap: 8px; overflow: hidden;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px; color: var(--accent); flex-shrink: 0;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                        <span class="url mono" id="imageDownloadName" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">encoded_secret.png</span>
+                    </div>
+                    <a href="#" download="encoded_secret.png" id="downloadImageBtn" class="pdf-dl-btn" style="text-decoration:none; margin-left: 10px;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        Download Image
+                    </a>
                 </div>
-            </div>
 
-            <div class="link-box">
-                <span class="url mono" id="shareable-link-p">Generating...</span>
-                <button class="copy-btn" data-target="shareable-link-p" data-span="copied-link" id="copyBtn">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                    Copy
-                </button>
-                <span class="copiedBtn" id="copied-link"></span>
-            </div>
+                <div class="link-box" id="shareableLinkBox">
+                    <span class="url mono" id="shareable-link-p">Generating...</span>
+                    <button class="copy-btn" data-target="shareable-link-p" data-span="copied-link" id="copyBtn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        Copy
+                    </button>
+                    <span class="copiedBtn" id="copied-link"></span>
+                </div>
 
-            <div class="link-box" id="rawMessageBox" style="margin-top: 5px;">
-                <span class="url mono" id="raw-message-p" style="font-size: 11px; color: var(--text-secondary);">Ciphertext will appear here...</span>
-                <button class="copy-btn" data-target="raw-message-p" data-span="copied-raw" id="copyRawBtn">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                    Copy RAW
-                </button>
-                <span class="copiedBtn" id="copied-raw"></span>
-            </div>
+                <div class="link-box" id="rawMessageBox" style="display: none; margin-top: 5px;">
+                    <span class="url mono" id="raw-message-p" style="font-size: 11px; color: var(--text-secondary);">Ciphertext will appear here...</span>
+                    <button class="copy-btn" data-target="raw-message-p" data-span="copied-raw" id="copyRawBtn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        Copy RAW
+                    </button>
+                    <span class="copiedBtn" id="copied-raw"></span>
+                </div>
 
-            <div class="meta-row" id="metaRow">
-                <span class="meta-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg><span id="expiryChipText">Expires in 1 hour</span></span>
-                <span class="meta-chip" id="pwChip" style="display:none;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span id="pwChipText">Password protected</span></span>
-                <span class="meta-chip" id="burnChip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 17a2.5 2.5 0 0 0 2.5-2.5c0-1.4-1-2-1-3.5 0 0 2 1 2 4a3.5 3.5 0 0 1-7 0c0-2.5 2-3 1.5-6C10 6 12 4 12 4s-1 3 1 5c1.5 1.5 2 3 2 5"/></svg><span id="burnChipText">Burns after reading</span></span>
-            </div>
+                <div class="meta-row" id="metaRow">
+                    <span class="meta-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg><span id="expiryChipText">Expires in 1 hour</span></span>
+                    <span class="meta-chip" id="pwChip" style="display:none;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span id="pwChipText">Password protected</span></span>
+                    <span class="meta-chip" id="burnChip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 17a2.5 2.5 0 0 0 2.5-2.5c0-1.4-1-2-1-3.5 0 0 2 1 2 4a3.5 3.5 0 0 1-7 0c0-2.5 2-3 1.5-6C10 6 12 4 12 4s-1 3 1 5c1.5 1.5 2 3 2 5"/></svg><span id="burnChipText">Burns after reading</span></span>
+                </div>
 
-            <button class="new-btn" id="close">Encrypt another message</button>
+                <button class="new-btn" id="close">Encrypt another message</button>
+            </div>
         </div>
-    </div>
 </main>
 
-<script src="{{ url_for('static', filename='js/crypto.js') }}"></script>
-<script src="{{ url_for('static', filename='js/ui.js') }}"></script>
-<script src="{{ url_for('static', filename='js/encrypter.js') }}"></script>
-<script src="{{ url_for('static', filename='js/script.js') }}"></script>
-<script src="{{ url_for('static', filename='js/pdf_encrypter.js') }}"></script>
+<script src="{{ url_for('static', filename='js/crypto.js') }}?v=6"></script>
+<script src="{{ url_for('static', filename='js/ui.js') }}?v=6"></script>
+<script src="{{ url_for('static', filename='js/pdf_encrypter.js') }}?v=6"></script>
+<script src="{{ url_for('static', filename='js/steg_encrypter.js') }}?v=6"></script>
+<script src="{{ url_for('static', filename='js/encrypter.js') }}?v=6"></script>
+<script src="{{ url_for('static', filename='js/script.js') }}?v=6"></script>
 </body>
 </html>

@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=7">
 </head>
 <body>
 
@@ -32,7 +32,7 @@
 
 <header class="hero">
     <h1 id="decoderHeroTitle">Decrypt your <span class="em">Secret</span>.</h1>
-    <p class="sub" id="decoderHeroSub">Enter the encrypted ciphertext and password below to unlock and read your secure secret.</p>
+    <p class="sub" id="decoderHeroSub">Upload your encoded image below to extract and decrypt your hidden secret, or open a secure Endec link.</p>
 </header>
 
 <main>
@@ -112,28 +112,19 @@
             </a>
         </div>
 
-        <!-- Manual Decryption Form (When no ?id is specified) -->
+        <!-- Manual Image Decryption Form (When no ?id is specified) -->
         <div class="encrypt-form" id="manualDecryptForm">
-            <div class="field-wrap">
-                <textarea id="emessage" placeholder="Paste the encrypted ciphertext here…"></textarea>
-                <div class="cipher-strip" id="cipherStrip" style="display: none;">
-                    <span class="lock-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
-                    </span>
-                    <span id="cipherText">waiting for input…</span>
-                </div>
-            </div>
-
-            <div class="options">
-                <div class="opt-pill expanded" id="pwPill">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
-                    <input type="password" id="ePassword" placeholder="Enter password (if required)" style="display: block; width: 100%;">
-                </div>
+            <div class="field-wrap" id="decFieldWrap">
+                <label class="dropzone active" id="stegDecDropzone" for="steg-decode-select" style="display: flex;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                    <span id="stegDecDropText"><span class="browse">Choose encoded image</span> (PNG) or drag it here</span>
+                </label>
+                <input type="file" id="steg-decode-select" accept="image/png, image/jpeg, image/jpg, image/webp" style="display: none;">
             </div>
 
             <button class="cta" id="decode" type="button">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                Decrypt Secret
+                <span id="decodeBtnText">Extract &amp; Decrypt Secret</span>
             </button>
         </div>
 
@@ -149,9 +140,7 @@
                 </div>
             </div>
 
-            <div class="link-box" style="margin-top: 15px;">
-                <div class="decoder-box" id="dmessage"></div>
-            </div>
+            <div class="decoder-box decrypted-content" id="dmessage"></div>
 
             <div class="meta-row" style="margin-top: 12px;">
                 <span class="meta-chip" id="resultBurnBadge" style="display:none;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 17a2.5 2.5 0 0 0 2.5-2.5c0-1.4-1-2-1-3.5 0 0 2 1 2 4a3.5 3.5 0 0 1-7 0c0-2.5 2-3 1.5-6C10 6 12 4 12 4s-1 3 1 5c1.5 1.5 2 3 2 5"/></svg><span id="resultBurnBadgeText">Burned from server</span></span>
@@ -171,9 +160,10 @@
     </div>
 </main>
 
-<script src="{{ url_for('static', filename='js/crypto.js') }}"></script>
-<script src="{{ url_for('static', filename='js/ui.js') }}"></script>
-<script src="{{ url_for('static', filename='js/decrypter.js') }}"></script>
-<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+<script src="{{ url_for('static', filename='js/crypto.js') }}?v=6"></script>
+<script src="{{ url_for('static', filename='js/ui.js') }}?v=6"></script>
+<script src="{{ url_for('static', filename='js/steg_encrypter.js') }}?v=6"></script>
+<script src="{{ url_for('static', filename='js/decrypter.js') }}?v=6"></script>
+<script src="{{ url_for('static', filename='js/script.js') }}?v=6"></script>
 </body>
 </html>
