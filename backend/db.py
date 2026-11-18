@@ -13,9 +13,15 @@ class Base(DeclarativeBase):
     pass
 
 db = SQLAlchemy(model_class=Base)
-app = Flask(__name__)
 
-# PostgreSQL Connection String Handling (Supports Railway, Heroku, Render, or local SQLite)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+app = Flask(
+    __name__,
+    template_folder=os.path.join(BASE_DIR, "templates"),
+    static_folder=os.path.join(BASE_DIR, "static"),
+)
+
+# PostgreSQL Connection String Handling (Supports Railway, Heroku, Render, Vercel Postgres, Neon, or local SQLite)
 db_url = (
     os.getenv("DATABASE_URL")
     or os.getenv("DATABASE_PRIVATE_URL")
@@ -40,8 +46,11 @@ if not db_url:
     if db_user and db_pass and db_host and db_name:
         db_url = f"postgresql://{db_user}:{db_pass}@{db_host}/{db_name}"
     else:
-        # Fallback to SQLite so app never crashes if PostgreSQL is not yet linked in Railway
-        db_url = "sqlite:///encrypter.db"
+        # Fallback to SQLite (use writable /tmp on serverless environments like Vercel)
+        if os.getenv("VERCEL"):
+            db_url = "sqlite:////tmp/encrypter.db"
+        else:
+            db_url = "sqlite:///encrypter.db"
 
 if db_url.startswith("postgres://"):
     db_url = db_url.replace("postgres://", "postgresql://", 1)
@@ -51,7 +60,11 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
-STORAGE_DIR = os.path.join(os.getcwd(), "ephemeral_storage")
+# Storage directory (uses /tmp on Vercel to respect read-only serverless filesystem)
+if os.getenv("VERCEL"):
+    STORAGE_DIR = "/tmp/ephemeral_storage"
+else:
+    STORAGE_DIR = os.path.join(os.getcwd(), "ephemeral_storage")
 os.makedirs(STORAGE_DIR, exist_ok=True)
 
 db.init_app(app)
