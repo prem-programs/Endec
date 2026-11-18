@@ -90,8 +90,7 @@ def test_stegano_end_to_end(client):
     # Image download should now fail (404)
     res_download_after_burn = client.get(download_url)
     assert res_download_after_burn.status_code == 404
-
-
+    
 def test_index_page_structure_and_no_cache(client):
     res = client.get('/')
     assert res.status_code == 200
@@ -115,9 +114,9 @@ def test_decoder_page_tabs_and_image_section(client):
     res = client.get('/decrypter')
     assert res.status_code == 200
     html = res.data.decode('utf-8')
-    # Verify both Message and Image tabs exist on decrypter page
-    assert 'id="decTabCipher"' in html
-    assert 'id="decTabImage"' in html
+    # Verify raw message textarea and message tabs are removed
+    assert 'id="emessage"' not in html
+    assert 'id="decTabCipher"' not in html
     # Verify image dropzone exists
     assert 'id="stegDecDropzone"' in html
     assert 'id="steg-decode-select"' in html

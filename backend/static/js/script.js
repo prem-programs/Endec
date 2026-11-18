@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (isDecryptPage) {
+        if (typeof initStegDecoder === 'function') initStegDecoder();
         initManualDecryptForm();     // Manual form (no ?id=)
         initDecrypterPage();         // URL-driven state machine (async, handles ?id=)
     }

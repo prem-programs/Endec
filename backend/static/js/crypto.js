@@ -8,7 +8,13 @@ const PBKDF2_HASH = "SHA-256";
 const KEY_LENGTH = 256;
 
 function _toBase64(bytes) {
-    return btoa(String.fromCharCode(...bytes));
+    let binary = '';
+    const len = bytes.byteLength;
+    const chunkSize = 0x8000; // 32KB chunks prevent call stack overflow on large files (e.g. PDFs)
+    for (let i = 0; i < len; i += chunkSize) {
+        binary += String.fromCharCode.apply(null, bytes.subarray(i, Math.min(i + chunkSize, len)));
+    }
+    return btoa(binary);
 }
 
 function _fromBase64(base64) {
@@ -76,5 +82,5 @@ async function decryptAESGCM(data, password) {
  */
 function generateRandomKey() {
     const bytes = crypto.getRandomValues(new Uint8Array(16));
-    return btoa(String.fromCharCode(...bytes));
+    return _toBase64(bytes);
 }

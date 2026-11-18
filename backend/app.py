@@ -18,19 +18,34 @@ def _ensure_utc(dt):
     return dt.astimezone(timezone.utc)
 
 def purge_expired():
-    """Purge expired records from the database."""
+    """Purge expired records and ephemeral images from storage."""
     try:
         now = datetime.now(timezone.utc)
         # Handle both PostgreSQL (aware) and SQLite (naive string/timestamp)
         now_naive = now.replace(tzinfo=None)
-        db.session.query(Encryptedmessage).filter(
+        expired_msgs = db.session.query(Encryptedmessage).filter(
             Encryptedmessage.expires_at.isnot(None),
             (Encryptedmessage.expires_at < now) | (Encryptedmessage.expires_at < now_naive)
-        ).delete(synchronize_session=False)
+        ).all()
+        for msg in expired_msgs:
+            img_path = os.path.join(STORAGE_DIR, f"encoded_{msg.id}.png")
+            if os.path.exists(img_path):
+                try:
+                    os.remove(img_path)
+                except OSError:
+                    pass
+            db.session.delete(msg)
         db.session.commit()
     except Exception as e:
         db.session.rollback()
         print(f"Purge expired records warning: {e}")
+
+@app.after_request
+def add_header(response):
+    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -125,6 +140,15 @@ def get_secret(uid):
 @app.route('/api/del/<int:uid>', methods=['DELETE', 'POST'])
 def cleanup(uid):
     msg_to_delete = db.session.get(Encryptedmessage, uid)
+
+    # Purge associated steganography image if present
+    img_path = os.path.join(STORAGE_DIR, f"encoded_{uid}.png")
+    if os.path.exists(img_path):
+        try:
+            os.remove(img_path)
+        except OSError:
+            pass
+
     if msg_to_delete:
         try:
             db.session.delete(msg_to_delete)
@@ -209,9 +233,11 @@ def download_pdf(file_id):
 
     return response
 
-# image + message => image & message enc => 
+# ── Steganography Endpoints ──────────────────────────────────────────────────
+# Encoding: Embed secret UID into image pixels & store encrypted message in DB
 @app.route("/api/steg/enc", methods=['POST'])
 def ste_image():
+    purge_expired()
     s_img = request.files.get("image") or request.files.get("s_img")
     s_message = request.form.get("message") or request.form.get("s_message")
 
@@ -219,82 +245,146 @@ def ste_image():
         data = request.get_json(silent=True) or {}
         s_message = data.get("s_message") or data.get("message")
 
-    if not s_message:
-        return jsonify({"error": "Provide message"}), 400
+    if not s_message or not str(s_message).strip():
+        return jsonify({"error": "Please provide a secret message to hide."}), 400
 
-    # encrypting using /secret endpoint
-    with app.test_client() as client:
-        response = client.post(
-            "/secret",
-            json={
-                "message": s_message,
-                "expiry": 1,
-                "burn": True,
-                "has_password": False
-            }
-        )
-        result = response.get_json()
+    if not s_img or not s_img.filename:
+        return jsonify({"error": "Please provide a carrier image (PNG, JPG, etc.)."}), 400
 
-    
-    uid_payload = result.get("id")
+    exp_hours = request.form.get("expiry", 1)
+    burn_val = request.form.get("burn")
+    burn = True if burn_val is None else (str(burn_val).lower() in ("true", "1", "yes", "on"))
+    has_password_val = request.form.get("has_password", False)
+    has_password = (str(has_password_val).lower() in ("true", "1", "yes", "on"))
 
-    if s_img:
-        input_image_path = os.path.join(STORAGE_DIR, f"temp_{uuid.uuid4().hex}.png")
-        s_img.save(input_image_path)
-    else:
-        input_image_path = "image.png"
+    now = datetime.now(timezone.utc)
+    try:
+        exp_hours_float = float(exp_hours)
+    except (TypeError, ValueError):
+        exp_hours_float = 1.0
 
-    output_image_path = os.path.join(STORAGE_DIR, f"encoded_{uid_payload}.png")
-    encode_message(input_image_path, f"{uid_payload}", output_image_path)
+    expires_at = now + timedelta(hours=exp_hours_float)
 
-    # Clean up input file to free disk space
-    if os.path.exists(input_image_path):
-        os.remove(input_image_path)
-
-    return jsonify({
-        "success": True,
-        "id": uid_payload,
-        "encoded_image": output_image_path,
-        "result": result
-    }), 200
-
-
-# image => extract hidden message => return decoded message
-@app.route("/api/steg/dec", methods=['POST'])
-def ste_message():
-    
-    img = request.files.get("image") or request.files.get("img")
-
-    if img:
-        temp_path = os.path.join(STORAGE_DIR, f"dec_input_{uuid.uuid4().hex}.png")
-        img.save(temp_path)
-        image_path = temp_path
-    elif uid:
-        image_path = os.path.join(STORAGE_DIR, f"encoded_{uid}.png")
-        temp_path = None
-    else:
-        return jsonify({"error": "Provide an image file or a valid uid"}), 400
-
-    if not os.path.exists(image_path):
-        return jsonify({"error": "Image file not found"}), 404
+    emsg = Encryptedmessage(
+        emessage=str(s_message).strip(),
+        created_at=now,
+        expires_at=expires_at,
+        burn_after_reading=bool(burn),
+        has_password=bool(has_password)
+    )
 
     try:
-        decoded_message = decode_message(image_path)
+        db.session.add(emsg)
+        db.session.commit()
     except Exception as e:
-        return jsonify({"error": f"Failed to decode image: {e}"}), 400
-    finally:
-        if temp_path and os.path.exists(temp_path):
-            os.remove(temp_path)
+        db.session.rollback()
+        return jsonify({"error": f"Failed to store secret: {e}"}), 500
 
-    secret_data = None
-    if uid:
-        with app.test_client() as client:
-            res = client.get(f"/api/secret/{uid}")
-            if res.status_code == 200:
-                secret_data = res.get_json()
+    uid = emsg.id
+    output_image_path = os.path.join(STORAGE_DIR, f"encoded_{uid}.png")
+
+    try:
+        encode_message(s_img, str(uid), output_image_path)
+    except Exception as e:
+        # Roll back record if image encoding fails
+        try:
+            db.session.delete(emsg)
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+        return jsonify({"error": f"Failed to encode secret into image: {e}"}), 400
+
+    download_url = f"/api/steg/download/{uid}"
 
     return jsonify({
         "success": True,
-        "decoded_message": decoded_message,
-        "secret": secret_data
+        "id": uid,
+        "download_url": download_url,
+        "filename": f"encoded_{uid}.png",
+        "result": {
+            "id": uid,
+            "has_password": emsg.has_password,
+            "burn_after_reading": emsg.burn_after_reading,
+            "expires_at": emsg.expires_at.isoformat() if emsg.expires_at else None
+        }
+    }), 201
+
+
+# Download encoded image
+@app.route("/api/steg/download/<int:uid>", methods=['GET'])
+def download_steg_image(uid):
+    image_path = os.path.join(STORAGE_DIR, f"encoded_{uid}.png")
+    if not os.path.exists(image_path):
+        return jsonify({"error": "This encoded image has already been downloaded and destroyed, or it never existed."}), 404
+
+    enc_message = db.session.get(Encryptedmessage, uid)
+    if not enc_message:
+        if os.path.exists(image_path):
+            try:
+                os.remove(image_path)
+            except OSError:
+                pass
+        return jsonify({"error": "The secret in this image has expired or was already destroyed."}), 404
+
+    return send_file(
+        image_path,
+        as_attachment=True,
+        download_name=f"encoded_{uid}.png",
+        mimetype="image/png"
+    )
+
+
+# Decoding: Extract UID from image pixels & retrieve secret
+@app.route("/api/steg/dec", methods=['POST'])
+def ste_message():
+    purge_expired()
+    img = request.files.get("image") or request.files.get("img")
+
+    if not img or not img.filename:
+        return jsonify({"error": "Please provide an encoded image file to decode."}), 400
+
+    try:
+        decoded_payload = decode_message(img)
+    except Exception as e:
+        return jsonify({"error": f"Failed to extract secret from image: {e}"}), 400
+
+    try:
+        uid = int(str(decoded_payload).strip())
+    except (ValueError, TypeError):
+        return jsonify({"error": "No valid Endec secret UID found in this image."}), 400
+
+    enc_message = db.session.get(Encryptedmessage, uid)
+    if not enc_message:
+        return jsonify({"error": "Secret not found or has already been burned/expired."}), 404
+
+    now = datetime.now(timezone.utc)
+    expires_at = _ensure_utc(enc_message.expires_at)
+    created_at = _ensure_utc(enc_message.created_at)
+
+    if expires_at and expires_at < now:
+        try:
+            db.session.delete(enc_message)
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+        # Clean up image on disk
+        image_path = os.path.join(STORAGE_DIR, f"encoded_{uid}.png")
+        if os.path.exists(image_path):
+            try:
+                os.remove(image_path)
+            except OSError:
+                pass
+        return jsonify({"error": "This secret has expired and is no longer available."}), 410
+
+    return jsonify({
+        "success": True,
+        "uid": uid,
+        "secret": {
+            "id": enc_message.id,
+            "emessage": enc_message.emessage,
+            "has_password": bool(enc_message.has_password),
+            "burn_after_reading": bool(enc_message.burn_after_reading),
+            "created_at": created_at.isoformat() if created_at else None,
+            "expires_at": expires_at.isoformat() if expires_at else None
+        }
     }), 200

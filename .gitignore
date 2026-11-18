@@ -21,3 +21,9 @@ package-lock.json
 package.json
 *.md
 *.txt
+ephemeral_storage/
+enc.png
+ou.png
+out-encrypt.pdf
+backend/clean_code.pdf
+.pytest_cache/

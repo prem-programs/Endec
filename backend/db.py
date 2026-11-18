@@ -48,6 +48,8 @@ if db_url.startswith("postgres://"):
 
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['TEMPLATES_AUTO_RELOAD'] = True
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 STORAGE_DIR = os.path.join(os.getcwd(), "ephemeral_storage")
 os.makedirs(STORAGE_DIR, exist_ok=True)

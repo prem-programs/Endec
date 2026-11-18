@@ -235,46 +235,11 @@ async function initDecrypterPage() {
 
 // ── Manual decrypt form (no ?id= present) ────────────────────────────────────
 function initManualDecryptForm() {
-    const btn      = document.getElementById('decode');
-    const msgInput = document.getElementById('emessage');
-    const passInput = document.getElementById('ePassword');
-    const modal    = document.querySelector('.modal_content');
-
+    const btn = document.getElementById('decode');
     if (!btn) return;
 
     btn.addEventListener('click', async e => {
         e.preventDefault();
-
-        const cipherText = msgInput?.value.trim() || '';
-        const pass       = passInput?.value.trim() || '';
-
-        if (!cipherText) {
-            alert('Please paste the ciphertext to decrypt.');
-            msgInput?.focus();
-            return;
-        }
-
-        const origHtml = btn.innerHTML;
-        btn.disabled = true;
-        btn.innerHTML = '<span class="spinner-ring" style="width:16px;height:16px;margin:0;border-width:2px;display:inline-block;vertical-align:middle;margin-right:8px;"></span> Decrypting…';
-
-        try {
-            const decrypted = await decryptAESGCM(cipherText, pass);
-            displayDecryptedMessage(decrypted);
-
-            const card = document.getElementById('card');
-            if (card)  card.classList.add('result-mode');
-            if (modal) modal.classList.add('show');
-
-            const form = document.getElementById('manualDecryptForm');
-            if (form) form.style.display = 'none';
-            bindModalButtons();
-        } catch (err) {
-            console.error('Decryption failed:', err);
-            alert('Decryption failed. Please check your ciphertext and password.');
-        } finally {
-            btn.disabled = false;
-            btn.innerHTML = origHtml;
-        }
+        await decodeStegImage();
     });
 }
