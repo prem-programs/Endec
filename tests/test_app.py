@@ -1,7 +1,7 @@
 import io
-import cv2
 import numpy as np
 import pytest
+from PIL import Image
 from backend.app import app
 from backend.db import db
 
@@ -16,9 +16,11 @@ def client():
 
 
 def create_dummy_image_bytes():
-    img = np.zeros((100, 100, 3), dtype=np.uint8)
-    success, buf = cv2.imencode('.png', img)
-    return io.BytesIO(buf.tobytes())
+    img = Image.new("RGB", (100, 100), color=(0, 0, 0))
+    buf = io.BytesIO()
+    img.save(buf, format="PNG")
+    buf.seek(0)
+    return buf
 
 
 def test_secret_flow(client):

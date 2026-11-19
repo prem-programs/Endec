@@ -1,6 +1,7 @@
 import os
-import cv2
+import io
 import numpy as np
+from PIL import Image
 
 
 def text_to_bits(message):
@@ -20,38 +21,30 @@ def _load_image(image_input):
     if isinstance(image_input, np.ndarray):
         return image_input
 
-    if isinstance(image_input, (bytes, bytearray)):
-        arr = np.frombuffer(image_input, dtype=np.uint8)
-        img = cv2.imdecode(arr, cv2.IMREAD_COLOR)
-        if img is None:
-            raise ValueError("Could not decode image from provided bytes.")
-        return img
+    try:
+        if isinstance(image_input, (bytes, bytearray)):
+            with Image.open(io.BytesIO(image_input)) as img:
+                return np.array(img.convert("RGB"))
 
-    if hasattr(image_input, "read"):
-        content = image_input.read()
-        if hasattr(image_input, "seek"):
-            image_input.seek(0)
-        arr = np.frombuffer(content, dtype=np.uint8)
-        img = cv2.imdecode(arr, cv2.IMREAD_COLOR)
-        if img is None:
-            raise ValueError("Could not decode image from stream.")
-        return img
+        if hasattr(image_input, "read"):
+            content = image_input.read()
+            if hasattr(image_input, "seek"):
+                image_input.seek(0)
+            with Image.open(io.BytesIO(content)) as img:
+                return np.array(img.convert("RGB"))
 
-    if hasattr(image_input, "stream") and hasattr(image_input.stream, "read"):
-        content = image_input.stream.read()
-        if hasattr(image_input.stream, "seek"):
-            image_input.stream.seek(0)
-        arr = np.frombuffer(content, dtype=np.uint8)
-        img = cv2.imdecode(arr, cv2.IMREAD_COLOR)
-        if img is None:
-            raise ValueError("Could not decode image from FileStorage stream.")
-        return img
+        if hasattr(image_input, "stream") and hasattr(image_input.stream, "read"):
+            content = image_input.stream.read()
+            if hasattr(image_input.stream, "seek"):
+                image_input.stream.seek(0)
+            with Image.open(io.BytesIO(content)) as img:
+                return np.array(img.convert("RGB"))
 
-    if isinstance(image_input, (str, os.PathLike)):
-        img = cv2.imread(str(image_input), cv2.IMREAD_COLOR)
-        if img is None:
-            raise ValueError(f"Could not load image from path: {image_input}")
-        return img
+        if isinstance(image_input, (str, os.PathLike)):
+            with Image.open(str(image_input)) as img:
+                return np.array(img.convert("RGB"))
+    except Exception as e:
+        raise ValueError(f"Could not load image: {e}") from e
 
     raise TypeError(f"Unsupported image input type: {type(image_input)}")
 
@@ -95,9 +88,8 @@ def encode_message(image_input, message, output_path="encoded.png"):
         out_dir = os.path.dirname(output_path)
         if out_dir:
             os.makedirs(out_dir, exist_ok=True)
-        success = cv2.imwrite(output_path, image)
-        if not success:
-            raise IOError(f"Could not save output image to {output_path}")
+        img_out = Image.fromarray(image)
+        img_out.save(output_path, format="PNG")
 
     return image
 
@@ -105,10 +97,10 @@ def encode_message(image_input, message, output_path="encoded.png"):
 def encode_message_to_bytes(image_input, message):
     """Encodes a message into the image and returns PNG formatted bytes."""
     encoded_img = encode_message(image_input, message, output_path=None)
-    success, buffer = cv2.imencode('.png', encoded_img)
-    if not success:
-        raise IOError("Could not encode image into PNG buffer.")
-    return buffer.tobytes()
+    buffer = io.BytesIO()
+    img_out = Image.fromarray(encoded_img)
+    img_out.save(buffer, format="PNG")
+    return buffer.getvalue()
 
 
 def decode_message(image_input):
