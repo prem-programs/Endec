@@ -53,8 +53,6 @@ def handle_500(e):
     return f"<h3>500 Internal Server Error</h3><pre>{traceback.format_exc()}</pre>", 500
 
 @app.route('/', methods=['GET', 'POST'])
-@app.route('/api/index', methods=['GET', 'POST'])
-@app.route('/api/index.py', methods=['GET', 'POST'])
 def index():
     return render_template('index.html')
 
