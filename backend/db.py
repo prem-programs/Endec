@@ -38,6 +38,20 @@ if not db_url and os.getenv("PGHOST"):
     pgdb = os.getenv("PGDATABASE", "railway")
     db_url = f"postgresql://{pguser}:{pgpass}@{pghost}:{pgport}/{pgdb}"
 
+def _is_serverless():
+    if os.getenv("VERCEL") or os.getenv("AWS_LAMBDA_FUNCTION_NAME") or os.getenv("LAMBDA_TASK_ROOT"):
+        return True
+    try:
+        test_path = os.path.join(os.getcwd(), ".write_test")
+        with open(test_path, "w") as f:
+            f.write("1")
+        os.remove(test_path)
+        return False
+    except Exception:
+        return True
+
+SERVERLESS = _is_serverless()
+
 if not db_url:
     db_user = os.getenv("DB_USER")
     db_pass = os.getenv("DB_PASSWORD")
@@ -47,7 +61,7 @@ if not db_url:
         db_url = f"postgresql://{db_user}:{db_pass}@{db_host}/{db_name}"
     else:
         # Fallback to SQLite (use writable /tmp on serverless environments like Vercel)
-        if os.getenv("VERCEL"):
+        if SERVERLESS:
             db_url = "sqlite:////tmp/encrypter.db"
         else:
             db_url = "sqlite:///encrypter.db"
@@ -61,11 +75,16 @@ app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 # Storage directory (uses /tmp on Vercel to respect read-only serverless filesystem)
-if os.getenv("VERCEL"):
+if SERVERLESS:
     STORAGE_DIR = "/tmp/ephemeral_storage"
 else:
     STORAGE_DIR = os.path.join(os.getcwd(), "ephemeral_storage")
-os.makedirs(STORAGE_DIR, exist_ok=True)
+
+try:
+    os.makedirs(STORAGE_DIR, exist_ok=True)
+except Exception:
+    STORAGE_DIR = "/tmp/ephemeral_storage"
+    os.makedirs(STORAGE_DIR, exist_ok=True)
 
 db.init_app(app)
 
