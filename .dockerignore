@@ -1,0 +1,33 @@
+# Virtual Environments
+venv/
+.venv/
+env/
+.env
+
+# Python caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# Git & IDE
+.git/
+.gitignore
+.vscode/
+.idea/
+
+# Database & Storage
+*.db
+instance/
+ephemeral_storage/*
+!ephemeral_storage/.gitkeep
+
+# Temporary & Test files
+tests/
+encoded*.png
+*.pdf
+*.md
+Dockerfile
+.dockerignore
+render.yaml
