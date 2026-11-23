@@ -20,7 +20,10 @@ def _load_image(image_input):
     """Load an image from filepath, raw bytes, file-like stream, or numpy array."""
     if isinstance(image_input, np.ndarray):
         return image_input
-
+ 
+    with Image.open(image_input) as img:
+        img.thumbnail((1280, 1280), Image.Resampling.LANCZOS)
+        return np.array(img.convert("RGB"))
     try:
         if isinstance(image_input, (bytes, bytearray)):
             with Image.open(io.BytesIO(image_input)) as img:

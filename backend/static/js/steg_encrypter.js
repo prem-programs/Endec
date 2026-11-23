@@ -147,11 +147,12 @@ async function encryptStegImage() {
             method: 'POST',
             body: formData
         });
-
-        const data = await res.json();
-        if (!res.ok || !data.success) {
-            throw new Error(data.error || 'Failed to encode secret into image.');
+        
+        if (!res.ok) {
+            const errorText = await res.text();
+            throw new Error(`Server returned status ${res.status}: ${errorText.substring(0, 100)}`);
         }
+        const data = await res.json();
 
         // Direct automatic download of the encoded image (no link needed)
         const dlLink = document.createElement('a');

@@ -4,11 +4,12 @@ from typing import Optional
 from datetime import datetime, timezone
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from backend.db import db
+import uuid
 
 
 class Encryptedmessage(db.Model):
     __tablename__ = "encrypted_message"
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id = db.Column(db.String(36), primary_key=True,default=lambda:str(uuid.uuid4()))
     emessage: Mapped[str] = mapped_column(Text)
     created_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     expires_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)

@@ -105,7 +105,7 @@ def secret():
         print(f"Error saving secret: {e}")
         return jsonify({"message": "Failed to store secret"}), 500
 
-@app.route('/api/secret/<int:uid>', methods=['GET'])
+@app.route('/api/secret/<string:uid>', methods=['GET'])
 def get_secret(uid):
     now = datetime.now(timezone.utc)
     enc_message = db.session.get(Encryptedmessage, uid)
@@ -141,8 +141,8 @@ def get_secret(uid):
         "expires_at": expires_at.isoformat() if expires_at else None
     })
 
-@app.route('/api/secret/<int:uid>/burn', methods=['POST', 'DELETE'])
-@app.route('/api/del/<int:uid>', methods=['DELETE', 'POST'])
+@app.route('/api/secret/<string:uid>/burn', methods=['POST', 'DELETE'])
+@app.route('/api/del/<string:uid>', methods=['DELETE', 'POST'])
 def cleanup(uid):
     msg_to_delete = db.session.get(Encryptedmessage, uid)
 
@@ -316,7 +316,7 @@ def ste_image():
 
 
 # Download encoded image
-@app.route("/api/steg/download/<int:uid>", methods=['GET'])
+@app.route("/api/steg/download/<string:uid>", methods=['GET'])
 def download_steg_image(uid):
     image_path = os.path.join(STORAGE_DIR, f"encoded_{uid}.png")
     if not os.path.exists(image_path):
@@ -354,7 +354,7 @@ def ste_message():
         return jsonify({"error": f"Failed to extract secret from image: {e}"}), 400
 
     try:
-        uid = int(str(decoded_payload).strip())
+        uid = str(decoded_payload).strip()
     except (ValueError, TypeError):
         return jsonify({"error": "No valid Endec secret UID found in this image."}), 400
 
