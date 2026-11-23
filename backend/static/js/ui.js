@@ -233,6 +233,21 @@ function _resetEncryptForm() {
     const stegSelect = document.getElementById('steg-select');
     if (stegSelect) stegSelect.value = '';
 
+    const stegWrap = document.getElementById('stegEncryptWrap');
+    if (stegWrap) stegWrap.style.display = 'none';
+
+    const stegMessage = document.getElementById('stegMessage');
+    if (stegMessage) stegMessage.value = '';
+
+    const stegCoverCard = document.getElementById('stegCoverCard');
+    if (stegCoverCard) stegCoverCard.classList.remove('has-file', 'drag-over');
+
+    const stegCoverTitleText = document.getElementById('stegCoverTitleText');
+    if (stegCoverTitleText) stegCoverTitleText.textContent = 'Drop cover image';
+
+    const stegBoundBytes = document.getElementById('stegBoundBytes');
+    if (stegBoundBytes) stegBoundBytes.textContent = '0 B bound';
+
     const stegDropzone = document.getElementById('stegDropzone');
     if (stegDropzone) {
         stegDropzone.classList.remove('active', 'has-file', 'drag-over');
