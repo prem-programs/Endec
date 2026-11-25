@@ -157,7 +157,7 @@ async function encryptStegImage() {
         // Direct automatic download of the encoded image (no link needed)
         const dlLink = document.createElement('a');
         dlLink.href = data.download_url;
-        dlLink.download = data.filename || `encoded_${data.id}.png`;
+        dlLink.download = data.filename || 'endec_secret.png';
         document.body.appendChild(dlLink);
         dlLink.click();
         dlLink.remove();
@@ -195,9 +195,9 @@ function _populateStegResultModal(data) {
     if (imageDownloadBox && downloadImageBtn) {
         imageDownloadBox.style.display = 'flex';
         downloadImageBtn.href = data.download_url;
-        downloadImageBtn.download = data.filename || `encoded_${data.id}.png`;
+        downloadImageBtn.download = data.filename || 'endec_secret.png';
         if (imageDownloadName) {
-            imageDownloadName.textContent = data.filename || `encoded_${data.id}.png`;
+            imageDownloadName.textContent = data.filename || 'endec_secret.png';
         }
     }
 

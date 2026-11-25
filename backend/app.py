@@ -5,6 +5,7 @@ from datetime import datetime, timezone, timedelta
 from backend.pdf_endec import encrypt_pdf,decrypt_pdf
 from backend.stegano import  encode_message,decode_message
 import uuid
+import secrets
 import os
 import requests
 
@@ -178,7 +179,7 @@ def upload_pdf():
         return jsonify({"error": "Provide pdf file only."}), 400
 
     try:
-        file_id = str(uuid.uuid4())
+        file_id = secrets.token_urlsafe(8)
         dest_path = os.path.join(STORAGE_DIR, f"{file_id}.pdf")
         encrypt_pdf(file, dest_path, password)
 
@@ -305,7 +306,7 @@ def ste_image():
         "success": True,
         "id": uid,
         "download_url": download_url,
-        "filename": f"encoded_{uid}.png",
+        "filename": "endec_secret.png",
         "result": {
             "id": uid,
             "has_password": emsg.has_password,
@@ -334,7 +335,7 @@ def download_steg_image(uid):
     return send_file(
         image_path,
         as_attachment=True,
-        download_name=f"encoded_{uid}.png",
+        download_name="endec_secret.png",
         mimetype="image/png"
     )
 
