@@ -139,7 +139,7 @@ async function encryptStegImage() {
         const formData = new FormData();
         formData.append('image', carrierFile);
         formData.append('message', message);
-        formData.append('expiry', '720'); // 30 days
+        formData.append('expiry', '24');
         formData.append('burn', 'false');
         formData.append('has_password', 'false');
 

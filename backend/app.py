@@ -19,11 +19,13 @@ def _ensure_utc(dt):
     return dt.astimezone(timezone.utc)
 
 def purge_expired():
-    """Purge expired records and ephemeral images from storage."""
+    """Purge expired records, ephemeral images, and uncollected encrypted files from storage."""
     try:
         now = datetime.now(timezone.utc)
         # Handle both PostgreSQL (aware) and SQLite (naive string/timestamp)
         now_naive = now.replace(tzinfo=None)
+
+        # 1. Purge expired secret messages and images
         expired_msgs = db.session.query(Encryptedmessage).filter(
             Encryptedmessage.expires_at.isnot(None),
             (Encryptedmessage.expires_at < now) | (Encryptedmessage.expires_at < now_naive)
@@ -36,6 +38,20 @@ def purge_expired():
                 except OSError:
                     pass
             db.session.delete(msg)
+
+        # 2. Purge expired PDF/file uploads left on disk
+        expired_files = db.session.query(EncryptedFileRecord).filter(
+            EncryptedFileRecord.expires_at.isnot(None),
+            (EncryptedFileRecord.expires_at < now) | (EncryptedFileRecord.expires_at < now_naive)
+        ).all()
+        for rec in expired_files:
+            if rec.disk_path and os.path.exists(rec.disk_path):
+                try:
+                    os.remove(rec.disk_path)
+                except OSError:
+                    pass
+            db.session.delete(rec)
+
         db.session.commit()
     except Exception as e:
         db.session.rollback()
@@ -168,15 +184,24 @@ def cleanup(uid):
 # User A uploads -> Server encrypts -> Saves UUID in Postgres -> Returns link
 @app.route('/api/upload-pdf', methods=['POST'])
 def upload_pdf():
+    purge_expired()
     file = request.files.get("file")
     password = request.form.get('password')
-
+    exp_hours = request.form.get('expiry', 1)
 
     if not file or not password:
         return jsonify({"error": "Both a PDF file and a password are required."}), 400
 
     if not file.filename.lower().endswith('.pdf'):
         return jsonify({"error": "Provide pdf file only."}), 400
+
+    now = datetime.now(timezone.utc)
+    try:
+        exp_hours_float = float(exp_hours)
+    except (TypeError, ValueError):
+        exp_hours_float = 1.0
+
+    expires_at = now + timedelta(hours=exp_hours_float)
 
     try:
         file_id = secrets.token_urlsafe(8)
@@ -186,7 +211,9 @@ def upload_pdf():
         record = EncryptedFileRecord(
             id=file_id,
             original_filename=file.filename,
-            disk_path=dest_path
+            disk_path=dest_path,
+            created_at=now,
+            expires_at=expires_at
         )
         db.session.add(record)
         db.session.commit()

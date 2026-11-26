@@ -1,10 +1,11 @@
 /**
  * PDF-specific upload flow. Other file types are encrypted client-side.
  */
-async function encryptPdfFile(file, password) {
+async function encryptPdfFile(file, password, expiryHours = 1) {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('password', password);
+    formData.append('expiry', expiryHours);
 
     const response = await fetch('/api/upload-pdf', {
         method: 'POST',
@@ -42,12 +43,14 @@ async function encryptPdfFile(file, password) {
     if (subEl) {
         subEl.textContent = 'Share this one-time download link and send the PDF password separately. The recipient will need the password to open the downloaded PDF.';
     }
-    if (expiryChipText) expiryChipText.textContent = 'One-time download';
+    const expSelect = document.getElementById('expiry');
+    const expText = expSelect ? expSelect.options[expSelect.selectedIndex].text : '1 hour';
+    if (expiryChipText) expiryChipText.textContent = `Expires in ${expText}`;
     if (pwChip) {
         pwChip.style.display = 'flex';
         if (pwChipText) pwChipText.textContent = 'PDF password required';
     }
-    if (burnChipText) burnChipText.textContent = 'Single-use download';
+    if (burnChipText) burnChipText.textContent = 'Burns on download';
 
     if (card) card.classList.add('result-mode');
     if (modal) modal.classList.add('show');

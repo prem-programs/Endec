@@ -4,12 +4,12 @@ from typing import Optional
 from datetime import datetime, timezone
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from backend.db import db
-import uuid
+import secrets
 
 
 class Encryptedmessage(db.Model):
     __tablename__ = "encrypted_message"
-    id = db.Column(db.String(36), primary_key=True,default=lambda:str(uuid.uuid4()))
+    id = db.Column(db.String(36), primary_key=True, default=lambda: secrets.token_urlsafe(8))
     emessage: Mapped[str] = mapped_column(Text)
     created_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     expires_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
@@ -19,7 +19,8 @@ class Encryptedmessage(db.Model):
 class EncryptedFileRecord(db.Model):
     __tablename__ = "encrypted_files"
 
-    id = db.Column(db.String(36), primary_key=True)  # UUID
+    id = db.Column(db.String(36), primary_key=True, default=lambda: secrets.token_urlsafe(8))
     original_filename = db.Column(db.String(255), nullable=False)
     disk_path = db.Column(db.String(512), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+    expires_at = db.Column(db.DateTime(timezone=True), nullable=True)

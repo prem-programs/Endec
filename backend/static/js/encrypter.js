@@ -113,10 +113,9 @@ function initFileAttachment() {
     }
 
     function updatePdfOptions() {
-        const file = fileInput.files?.[0];
-        const isPdfOnly = Boolean(file && isPdfFile(file) && !msgInput?.value?.trim());
-        if (expiryPill) expiryPill.hidden = isPdfOnly;
-        if (burnPill) burnPill.hidden = isPdfOnly;
+        // Expiry and Burn-after-read are supported for all payloads and uploads.
+        if (expiryPill) expiryPill.hidden = false;
+        if (burnPill) burnPill.hidden = false;
     }
 
     function handleSelectedFile(file) {
@@ -271,7 +270,9 @@ function initEncryptButton() {
             btn.disabled = true;
             btn.innerHTML = '<span class="spinner-ring" style="width:16px;height:16px;margin:0;border-width:2px;display:inline-block;vertical-align:middle;margin-right:8px;"></span> Encrypting PDF…';
             try {
-                await encryptPdfFile(selectedFile, rawPass);
+                const expSelect = document.getElementById('expiry');
+                const expHours = expSelect ? expSelect.value : 1;
+                await encryptPdfFile(selectedFile, rawPass, expHours);
             } catch (err) {
                 alert(err.message || 'PDF encryption failed.');
             } finally {
